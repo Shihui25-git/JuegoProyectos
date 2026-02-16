@@ -45,6 +45,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- FUNCIONES DE ARCADE ---
 
+    // --- FUNCIONES DE ARCADE ---
+
     function showGameMenu() {
         if (gameMenu) gameMenu.classList.remove('hidden');
         if (levelMenu) levelMenu.classList.add('hidden');
@@ -93,9 +95,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const btn = card.querySelector('.btn');
             const statusLabel = card.querySelector('.level-status');
 
+            // Logic adapted to new HTML structure provided
             if (level < maxUnlocked) {
                 card.classList.remove('level-card-locked');
-                card.classList.add('completed');
+                // card.classList.add('completed');
                 if (statusLabel) statusLabel.textContent = 'COMPLETADO';
                 if (btn) {
                     btn.disabled = false;
@@ -103,7 +106,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } else if (level === maxUnlocked) {
                 card.classList.remove('level-card-locked');
-                card.classList.remove('completed');
                 if (statusLabel) statusLabel.textContent = 'DISPONIBLE';
                 if (btn) {
                     btn.disabled = false;
@@ -111,7 +113,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } else {
                 card.classList.add('level-card-locked');
-                card.classList.remove('completed');
                 if (statusLabel) statusLabel.textContent = 'BLOQUEADO';
                 if (btn) {
                     btn.disabled = true;
@@ -130,34 +131,56 @@ document.addEventListener('DOMContentLoaded', () => {
             const targetId = link.getAttribute('href').substring(1);
             showSection(targetId);
 
+            // Update URL hash without reloading
+            window.location.hash = targetId;
+
             if (targetId === 'arcade') {
                 showGameMenu();
             }
         });
     });
 
+    // Handle initial hash on load
+    if (window.location.hash) {
+        const hash = window.location.hash.substring(1);
+        if (['home', 'definicion', 'gestion', 'arcade'].includes(hash)) {
+            showSection(hash);
+            if (hash === 'arcade') showGameMenu();
+        }
+    }
+
     // Botón de inicio
     if (startBtn) {
         startBtn.addEventListener('click', () => {
+            // Go to Definicion section
             showSection('definicion');
+            window.location.hash = 'definicion';
         });
     }
 
     // Selección de juego
-    gameCards.forEach(card => {
-        const playBtn = card.querySelector('.btn');
-        if (playBtn) {
-            playBtn.addEventListener('click', () => {
-                const gameName = card.getAttribute('data-game');
-                // Logic for 'cyber-runner' removed as requested
-                /*
-                if (gameName === 'cyber-runner') {
-                    showLevelMenu();
-                }
-                */
-            });
-        }
-    });
+    if (gameCards) {
+        gameCards.forEach(card => {
+            const playBtn = card.querySelector('.btn');
+            if (playBtn) {
+                playBtn.addEventListener('click', () => {
+                    const gameName = card.getAttribute('data-game');
+                    if (gameName === 'cyber-runner') {
+                        // Direct Start Level 1
+                        showGame(1);
+                    }
+                });
+            }
+        });
+    }
+
+    // START GAME (Level 1)
+    const level1Btn = document.querySelector('.level-card[data-level="1"] button');
+    if (level1Btn) {
+        level1Btn.addEventListener('click', () => {
+            showGame(1);
+        });
+    }
 
     // Selección de nivel
     if (levelMenu) {
@@ -177,15 +200,22 @@ document.addEventListener('DOMContentLoaded', () => {
     if (backToGamesBtn) {
         backToGamesBtn.addEventListener('click', () => showGameMenu());
     }
+
     if (backToLevelsBtn) {
-        backToLevelsBtn.addEventListener('click', () => showLevelMenu());
+        backToLevelsBtn.addEventListener('click', () => {
+            // Go back to Game Menu directly, skipping Level Menu
+            showGameMenu();
+        });
     }
 
     // Exportar funciones necesarias
     window.updateLevelMenuUI = updateLevelMenuUI;
     window.showGameMenu = showGameMenu;
 
-    // Inicialización inicial
-    showSection('home');
+    // Inicialización inicial se maneja con el hash check arriba, 
+    // pero si no hay hash, mostramos home por defecto.
+    if (!window.location.hash) {
+        showSection('home');
+    }
 });
 

@@ -1000,52 +1000,74 @@ main {
     text-shadow: 0 0 10px var(--primary-color);
 }
 
-/* GAMEPLAY UI */
+/* Estilos para el Minijuego Arcade */
 .game-panel {
-    background: rgba(0, 5, 10, 0.95);
-    color: var(--text-color);
-}
-
-.game-container {
-    background: #000;
-    border-radius: 16px;
-    overflow: hidden;
-    position: relative;
-    border: 1px solid var(--glass-border);
-}
-
-canvas {
-    width: 100%;
-    max-width: 800px;
-    display: block;
+    max-width: 850px;
     margin: 0 auto;
 }
 
+.game-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    background: #000;
+    padding: 10px;
+    border: 1px solid #333;
+}
+
+canvas {
+    background: linear-gradient(to bottom, #006994 0%, #001e36 100%);
+    /* Lighter Sea Blue top to Dark bottom */
+    box-shadow: 0 0 10px rgba(0, 255, 65, 0.1);
+    image-rendering: pixelated;
+    /* Para estilo retro */
+    width: 100%;
+    max-width: 800px;
+    display: block;
+    border: 2px solid #004d6e;
+    /* Border to frame the sea */
+}
+
+/* UI del Juego (HUD) */
 .game-ui {
     position: absolute;
     top: 20px;
-    width: 100%;
-    padding: 0 30px;
+    left: 20px;
+    right: 20px;
     display: flex;
     justify-content: space-between;
     pointer-events: none;
+    max-width: none;
+    /* Override previous constraint */
+    transform: none;
+    /* Override previous constraint */
 }
 
 .hud-item {
-    background: rgba(0, 0, 0, 0.8);
-    padding: 10px 20px;
-    border-radius: 30px;
-    font-size: 0.9rem;
-    border: 1px solid var(--primary-color);
-    font-weight: 600;
+    font-family: 'Press Start 2P', cursive;
+    /* Fallback will happen if not loaded */
+    font-size: 0.8rem;
     color: var(--primary-color);
-    box-shadow: 0 0 10px rgba(0, 243, 255, 0.2);
+    text-shadow: 1px 1px 0 #000;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 5px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 5px;
 }
 
+/* Overlay de Inicio/Game Over */
 .overlay {
-    background: rgba(0, 5, 10, 0.95);
     border-radius: 16px;
     border: 1px solid var(--glass-border);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    padding: 2rem;
+    box-shadow: 0 0 30px rgba(0, 243, 255, 0.2);
+    width: 80%;
+    max-width: 400px;
 }
 
 .overlay h3 {
@@ -1059,109 +1081,6 @@ footer {
     color: var(--text-color);
     opacity: 0.6;
     border-top: 1px solid var(--glass-border);
-    margin-top: 4rem;
-}
-
-.game-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 6px;
-    background: var(--primary-color);
-}
-
-.game-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
-}
-
-.game-card-icon {
-    font-size: 4rem;
-    margin-bottom: 1.5rem;
-}
-
-.level-selection-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 1.5rem;
-}
-
-.level-card {
-    background: white;
-    border-radius: 20px;
-    padding: 2rem;
-    text-align: center;
-    border: 2px solid #edf2f7;
-    transition: 0.3s;
-}
-
-.level-card:hover:not(.level-card-locked) {
-    border-color: var(--primary-color);
-    background: rgba(10, 151, 217, 0.02);
-}
-
-.level-number {
-    font-size: 2.5rem;
-    color: var(--primary-color);
-    margin-bottom: 0.5rem;
-}
-
-/* GAMEPLAY UI */
-.game-panel {
-    background: #001220;
-    /* Deep Ocean Dark */
-    color: white;
-}
-
-.game-container {
-    background: #001220;
-    border-radius: 16px;
-    overflow: hidden;
-    position: relative;
-}
-
-canvas {
-    width: 100%;
-    max-width: 800px;
-    display: block;
-    margin: 0 auto;
-}
-
-.game-ui {
-    position: absolute;
-    top: 20px;
-    width: 100%;
-    padding: 0 30px;
-    display: flex;
-    justify-content: space-between;
-    pointer-events: none;
-}
-
-.hud-item {
-    background: rgba(0, 0, 0, 0.6);
-    padding: 10px 20px;
-    border-radius: 30px;
-    font-size: 0.9rem;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    font-weight: 600;
-}
-
-.overlay {
-    background: rgba(0, 18, 32, 0.95);
-    border-radius: 16px;
-}
-
-.overlay h3 {
-    color: var(--accent-color);
-}
-
-footer {
-    padding: 3rem;
-    text-align: center;
-    color: #718096;
-    border-top: 1px solid #e2e8f0;
     margin-top: 4rem;
 }
 

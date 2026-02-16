@@ -175,15 +175,15 @@
                 <div class="panel-body">
                     <h3 style="margin-bottom: 1.5rem;">Juegos Disponibles:</h3>
                     <div class="game-selection-grid">
-                        <div class="game-card game-card-locked" data-game="cyber-runner">
+                        <div class="game-card" data-game="cyber-runner">
                             <div class="game-card-icon">♻️</div>
                             <h4>ECO-SORT</h4>
-                            <p>Recicla y Salva - ¡Atrapa el Futuro!</p>
-                            <button class="btn btn-small" disabled>BLOQUEADO</button>
+                            <p>Clasifica los residuos correctamente contrarreloj.</p>
+                            <button class="btn btn-small">JUGAR</button>
                         </div>
                         <div class="game-card game-card-locked">
-                            <div class="game-card-icon">🔒</div>
-                            <h4>MUY PRONTO</h4>
+                            <div class="game-card-icon">🚧</div>
+                            <h4>PRÓXIMAMENTE</h4>
                             <p>Más juegos en desarrollo...</p>
                             <button class="btn btn-small" disabled>BLOQUEADO</button>
                         </div>
@@ -197,20 +197,18 @@
                 </div>
             </div>
 
-            <!-- Menú de Selección de Niveles (oculto inicialmente) -->
+            <!-- LEVEL SELECTION MENU -->
             <div id="level-menu" class="panel hidden">
                 <div class="panel-header">
                     <h2>&gt;&gt; ECO-SORT: SELECCIONA OBJETIVO</h2>
-                    <span id="back-to-games" class="back-btn">← JUEGOS</span>
+                    <span id="back-to-games" class="back-btn" style="cursor:pointer;">← VOLVER</span>
                 </div>
                 <div class="panel-body">
-                    <h3 style="margin-bottom: 1.5rem;">Elige tu desafío:</h3>
                     <div class="level-selection-grid">
                         <div class="level-card" data-level="1">
                             <div class="level-status">DISPONIBLE</div>
                             <div class="level-number">1</div>
                             <h4>SECTOR COSTA</h4>
-                            <p>ODS 14: Vida Submarina</p>
                             <p>Objetivo: 100 ptos</p>
                             <button class="btn btn-small">EMPEZAR</button>
                         </div>
@@ -218,7 +216,6 @@
                             <div class="level-status">BLOQUEADO</div>
                             <div class="level-number">2</div>
                             <h4>MAR ABIERTO</h4>
-                            <p>ODS 14: Vida Submarina</p>
                             <p>Objetivo: 250 ptos</p>
                             <button class="btn btn-small" disabled>🔒 BLOQUEADO</button>
                         </div>
@@ -226,7 +223,6 @@
                             <div class="level-number">3</div>
                             <div class="level-status">BLOQUEADO</div>
                             <h4>PROFUNDIDADES</h4>
-                            <p>ODS 14: Vida Submarina</p>
                             <p>Objetivo: 500 ptos</p>
                             <button class="btn btn-small" disabled>🔒 BLOQUEADO</button>
                         </div>
@@ -234,21 +230,25 @@
                 </div>
             </div>
 
-            <!-- Contenedor del Juego (oculto inicialmente) -->
+            <!-- GAME CONTAINER -->
             <div id="game-container-panel" class="panel game-panel hidden">
                 <div class="panel-header">
                     <h2>&gt;&gt; MISIÓN: ECO-SORT - OBJETIVO <span id="current-level">1</span></h2>
-                    <span id="back-to-levels" class="back-btn">← OBJETIVOS</span>
+                    <span id="back-to-levels" class="back-btn" style="cursor:pointer;">← MENÚ</span>
                 </div>
                 <div class="panel-body game-container">
-                    <canvas id="gameCanvas" width="800" height="400"></canvas>
+                    <canvas id="gameCanvas" width="800" height="400"
+                        style="background: url('assets/ocean_bg.svg'); background-size: cover; border-radius: 8px;"></canvas>
                     <div class="game-ui">
-                        <div class="hud-item">PUNTOS: <span id="score">0</span></div>
-                        <div class="hud-item">TIEMPO: <span id="time">00:00</span></div>
+                        <div class="hud-item">LIMPIEZA: <span id="score">0</span> / 100 ptos</div>
+                        <div class="hud-item">TIEMPO: <span id="time">2:00</span></div>
+                        <div class="hud-item">INTEGRIDAD: <span id="lives">4</span></div>
                     </div>
                     <div id="game-overlay" class="overlay">
-                        <h3>¿LISTO PARA COMENZAR?</h3>
-                        <p>Pulsa ENTER para iniciar la misión</p>
+                        <h3>PULSA ENTER PARA EMPEZAR</h3>
+                        <p>A: Izquierda | D: Derecha</p>
+                        <p style="color: var(--accent-color); font-size: 14px; font-weight: bold;">¡Recoge la BASURA
+                            para limpiar el mar y evita a los ANIMALES!</p>
                     </div>
                 </div>
             </div>
@@ -257,9 +257,10 @@
     </main>
 
     <footer>
-        <p>CONCIENCIACIÓN AMBIENTAL: ACTIVA | © 2024 Eco Project</p>
+        <p>CONCIENCIACIÓN AMBIENTAL: ACTIVA | © 2026 Eco Project</p>
     </footer>
 
+    <script src="js/game.js"></script>
     <script src="js/scripts.js"></script>
 
 </body>
