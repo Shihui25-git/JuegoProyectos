@@ -28,11 +28,16 @@
     <main>
         <section id="home" class="screen active">
             <div class="intro-container">
-                <h1 class="glitch" data-text="MISION 2030">MISIÓN 2030</h1>
-                <p>Protegiendo la Vida Submarina y la Biodiversidad Planetaria.</p>
-                <p>Únete a la unidad técnica ECO_SORT. Tu misión: restaurar el equilibrio en los océanos y sectores
-                    terrestres críticos.</p>
-                <button id="start-btn" class="btn">INICIAR MISIÓN: ODS 14</button>
+                <div class="mission-dashboard">
+                    <div class="system-status">SYSTEM: ONLINE_</div>
+                    <div class="sdg-badge">🌐 ODS 14: VIDA SUBMARINA</div>
+                    <!-- Hologram removed as requested -->
+                    <h1 class="glitch" data-text="MISION 2030">MISIÓN 2030</h1>
+                    <p class="mission-brief">Protegiendo la Vida Submarina y la Biodiversidad Planetaria.</p>
+                    <p class="mission-brief-detail">Únete a la unidad técnica ECO_SORT. Tu misión: restaurar el
+                        equilibrio en los océanos y sectores terrestres críticos.</p>
+                    <button id="start-btn" class="btn glitch-btn">INICIAR MISIÓN: ODS 14</button>
+                </div>
             </div>
         </section>
 
@@ -49,8 +54,7 @@
                         superficie.</p>
 
                     <div class="stats-grid" style="margin: 1.5rem 0;">
-                        <div class="data-log"
-                            style="border: 1px solid var(--primary-color); padding: 10px; background: rgba(0,255,65,0.05);">
+                        <div class="data-log">
                             <p>> [SISTEMA] 5 Niveles de intensidad progresiva detectados.</p>
                             <p>> [ENTORNO] Ciclo dinámico: Día, Atardecer, Noche, Alba y Tormenta.</p>
                             <p>> [AMENAZA] Vallas de seguridad con frecuencia de aparición variable.</p>
@@ -58,18 +62,27 @@
                     </div>
 
                     <h3>Mecánicas de Operación</h3>
-                    <ul class="task-list" style="margin-bottom: 1.5rem;">
-                        <li><span class="in-progress">[-]</span> <strong>Gestión de Limpieza:</strong> Recoge la basura
-                            y residuos para sumar puntos de sostenibilidad y ganar tiempo extra.</li>
-                        <li><span class="in-progress">[-]</span> <strong>Respeto Ambiental:</strong> No molestes a la
-                            fauna marina; colisionar con ellos dañará tu integridad de sistema (HP).</li>
-                        <li><span class="in-progress">[-]</span> <strong>Niveles de Objetivo:</strong> Supera cada
-                            sector eliminando contaminantes para restaurar el ecosistema.</li>
-                    </ul>
+                    <div class="mechanics-grid">
+                        <div class="mechanic-card">
+                            <div class="mech-icon">🧹</div>
+                            <h4>Gestión de Limpieza</h4>
+                            <p>Recoge la basura y residuos para sumar puntos de sostenibilidad y ganar tiempo extra.</p>
+                        </div>
+                        <div class="mechanic-card">
+                            <div class="mech-icon">🐬</div>
+                            <h4>Respeto Ambiental</h4>
+                            <p>No molestes a la fauna marina; colisionar con ellos dañará tu integridad de sistema (HP).
+                            </p>
+                        </div>
+                        <div class="mechanic-card">
+                            <div class="mech-icon">🎯</div>
+                            <h4>Niveles de Objetivo</h4>
+                            <p>Supera cada sector eliminando contaminantes para restaurar el ecosistema.</p>
+                        </div>
+                    </div>
 
-                    <div class="objective-box"
-                        style="background: rgba(255, 0, 255, 0.1); border: 1px solid var(--secondary-color); padding: 15px;">
-                        <h4 style="color: var(--secondary-color);">[!] META FINAL 2030:</h4>
+                    <div class="objective-box">
+                        <h4 style="color: var(--accent-color);">[!] META FINAL 2030:</h4>
                         <p>Superar el Sector GLOBAL (1000 km) para lograr una alianza total por los objetivos.</p>
                     </div>
                 </div>
@@ -83,35 +96,68 @@
                     <span class="close-btn">X</span>
                 </div>
                 <div class="panel-body">
-                    <h3>Bitácora del Desarrollador</h3>
-                    <ul class="task-list">
-                        <li class="complete">[x] Inicializar Repositorio</li>
-                        <li class="complete">[x] Estructura y Estilos Base</li>
-                        <li class="complete">[x] Implementar Lógica de Niveles</li>
-                        <li class="complete">[x] Sistema de Progreso Persistente</li>
-                        <li class="complete">[x] Temas Visuales Dinámicos</li>
-                        <li class="in-progress">[-] Pulido de Mecánicas HP</li>
-                        <li class="pending">[ ] Efectos de Sonido</li>
-                    </ul>
+                    <h3>Bitácora del Desarrollador (Timeline)</h3>
+                    <div class="timeline">
+                        <div class="timeline-item complete">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <h4>Fase 1: Inicialización</h4>
+                                <p>Repositorio y Estructura Base</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item complete">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <h4>Fase 2: Core Mechanics</h4>
+                                <p>Lógica de juego y Persistencia</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item in-progress">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <h4>Fase 3: UI/UX Upgrade</h4>
+                                <p>Tema "Oceanic Cyberpunk" aplicado</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item pending">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <h4>Fase 4: Audio & Polish</h4>
+                                <p>Efectos de sonido y partículas</p>
+                            </div>
+                        </div>
+                    </div>
 
-                    <h3>Indicadores Globales</h3>
+                    <h3>Indicadores Globales (System Status)</h3>
                     <div class="stats-grid">
-                        <div class="stat-item">
-                            <span class="label">Energía Limpia</span>
-                            <div class="bar">
-                                <div class="fill" style="width: 75%"></div>
+                        <div class="stat-item tech-stat">
+                            <div class="stat-icon">⚡</div>
+                            <div class="stat-info">
+                                <span class="label">Energía Limpia</span>
+                                <div class="tech-bar">
+                                    <div class="tech-fill" style="width: 75%"></div>
+                                </div>
+                                <span class="stat-value">75%</span>
                             </div>
                         </div>
-                        <div class="stat-item">
-                            <span class="label">Agua Potable</span>
-                            <div class="bar">
-                                <div class="fill" style="width: 60%"></div>
+                        <div class="stat-item tech-stat">
+                            <div class="stat-icon">💧</div>
+                            <div class="stat-info">
+                                <span class="label">Agua Potable</span>
+                                <div class="tech-bar">
+                                    <div class="tech-fill" style="width: 60%"></div>
+                                </div>
+                                <span class="stat-value">60%</span>
                             </div>
                         </div>
-                        <div class="stat-item">
-                            <span class="label">Índice Carbono</span>
-                            <div class="bar">
-                                <div class="fill" style="width: 40%"></div>
+                        <div class="stat-item tech-stat">
+                            <div class="stat-icon">📉</div>
+                            <div class="stat-info">
+                                <span class="label">Índice Carbono</span>
+                                <div class="tech-bar">
+                                    <div class="tech-fill warning" style="width: 40%"></div>
+                                </div>
+                                <span class="stat-value">40%</span>
                             </div>
                         </div>
                     </div>
