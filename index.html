@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ODS Runner - Sostenibilidad en Marcha</title>
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Fuente estilo pixel/retro opcional -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rajdhani:wght@400;600&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+
+    <header>
+        <div class="logo">ECO_PROJECT</div>
+        <nav>
+            <ul>
+                <li><a href="#home">INICIO</a></li>
+                <li><a href="#definicion">DEFINICIÓN</a></li>
+                <li><a href="#gestion">GESTIÓN</a></li>
+                <li><a href="#arcade">ARCADE</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section id="home" class="screen active">
+            <div class="intro-container">
+                <h1 class="glitch" data-text="MISION 2030">MISIÓN 2030</h1>
+                <p>Protegiendo la Vida Submarina y la Biodiversidad Planetaria.</p>
+                <p>Únete a la unidad técnica ECO_SORT. Tu misión: restaurar el equilibrio en los océanos y sectores
+                    terrestres críticos.</p>
+                <button id="start-btn" class="btn">INICIAR MISIÓN: ODS 14</button>
+            </div>
+        </section>
+
+        <section id="definicion" class="screen hidden">
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>>> MISIÓN: DEFINICIÓN</h2>
+                    <span class="close-btn">X</span>
+                </div>
+                <div class="panel-body">
+                    <h3>Protocolo: ECO-SORT CHALLENGE</h3>
+                    <p>Has sido seleccionado para la unidad de respuesta ambiental. Tu misión es interceptar los
+                        factores de cambio positivo y neutralizar las amenazas contaminantes antes de que lleguen a la
+                        superficie.</p>
+
+                    <div class="stats-grid" style="margin: 1.5rem 0;">
+                        <div class="data-log"
+                            style="border: 1px solid var(--primary-color); padding: 10px; background: rgba(0,255,65,0.05);">
+                            <p>> [SISTEMA] 5 Niveles de intensidad progresiva detectados.</p>
+                            <p>> [ENTORNO] Ciclo dinámico: Día, Atardecer, Noche, Alba y Tormenta.</p>
+                            <p>> [AMENAZA] Vallas de seguridad con frecuencia de aparición variable.</p>
+                        </div>
+                    </div>
+
+                    <h3>Mecánicas de Operación</h3>
+                    <ul class="task-list" style="margin-bottom: 1.5rem;">
+                        <li><span class="in-progress">[-]</span> <strong>Gestión de Limpieza:</strong> Recoge la basura
+                            y residuos para sumar puntos de sostenibilidad y ganar tiempo extra.</li>
+                        <li><span class="in-progress">[-]</span> <strong>Respeto Ambiental:</strong> No molestes a la
+                            fauna marina; colisionar con ellos dañará tu integridad de sistema (HP).</li>
+                        <li><span class="in-progress">[-]</span> <strong>Niveles de Objetivo:</strong> Supera cada
+                            sector eliminando contaminantes para restaurar el ecosistema.</li>
+                    </ul>
+
+                    <div class="objective-box"
+                        style="background: rgba(255, 0, 255, 0.1); border: 1px solid var(--secondary-color); padding: 15px;">
+                        <h4 style="color: var(--secondary-color);">[!] META FINAL 2030:</h4>
+                        <p>Superar el Sector GLOBAL (1000 km) para lograr una alianza total por los objetivos.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="gestion" class="screen hidden">
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>>> LOGS: GESTIÓN</h2>
+                    <span class="close-btn">X</span>
+                </div>
+                <div class="panel-body">
+                    <h3>Bitácora del Desarrollador</h3>
+                    <ul class="task-list">
+                        <li class="complete">[x] Inicializar Repositorio</li>
+                        <li class="complete">[x] Estructura y Estilos Base</li>
+                        <li class="complete">[x] Implementar Lógica de Niveles</li>
+                        <li class="complete">[x] Sistema de Progreso Persistente</li>
+                        <li class="complete">[x] Temas Visuales Dinámicos</li>
+                        <li class="in-progress">[-] Pulido de Mecánicas HP</li>
+                        <li class="pending">[ ] Efectos de Sonido</li>
+                    </ul>
+
+                    <h3>Indicadores Globales</h3>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span class="label">Energía Limpia</span>
+                            <div class="bar">
+                                <div class="fill" style="width: 75%"></div>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <span class="label">Agua Potable</span>
+                            <div class="bar">
+                                <div class="fill" style="width: 60%"></div>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <span class="label">Índice Carbono</span>
+                            <div class="bar">
+                                <div class="fill" style="width: 40%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="arcade" class="screen hidden">
+            <!-- Menú de Selección de Juegos -->
+            <div id="game-menu" class="panel">
+                <div class="panel-header">
+                    <h2>>> ARCADE: SELECT GAME</h2>
+                    <span class="close-btn">X</span>
+                </div>
+                <div class="panel-body">
+                    <h3 style="margin-bottom: 1.5rem;">Juegos Disponibles:</h3>
+                    <div class="game-selection-grid">
+                        <div class="game-card game-card-locked" data-game="cyber-runner">
+                            <div class="game-card-icon">♻️</div>
+                            <h4>ECO-SORT</h4>
+                            <p>Recicla y Salva - ¡Atrapa el Futuro!</p>
+                            <button class="btn btn-small" disabled>BLOQUEADO</button>
+                        </div>
+                        <div class="game-card game-card-locked">
+                            <div class="game-card-icon">🔒</div>
+                            <h4>MUY PRONTO</h4>
+                            <p>Más juegos en desarrollo...</p>
+                            <button class="btn btn-small" disabled>BLOQUEADO</button>
+                        </div>
+                        <div class="game-card game-card-locked">
+                            <div class="game-card-icon">🔒</div>
+                            <h4>MUY PRONTO</h4>
+                            <p>Más juegos en desarrollo...</p>
+                            <button class="btn btn-small" disabled>BLOQUEADO</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Menú de Selección de Niveles (oculto inicialmente) -->
+            <div id="level-menu" class="panel hidden">
+                <div class="panel-header">
+                    <h2>>> ECO-SORT: SELECCIONA OBJETIVO</h2>
+                    <span id="back-to-games" class="back-btn">← JUEGOS</span>
+                </div>
+                <div class="panel-body">
+                    <h3 style="margin-bottom: 1.5rem;">Elige tu desafío:</h3>
+                    <div class="level-selection-grid">
+                        <div class="level-card" data-level="1">
+                            <div class="level-status">DISPONIBLE</div>
+                            <div class="level-number">1</div>
+                            <h4>SECTOR COSTA</h4>
+                            <p>ODS 14: Vida Submarina</p>
+                            <p>Objetivo: 100 ptos</p>
+                            <button class="btn btn-small">EMPEZAR</button>
+                        </div>
+                        <div class="level-card level-card-locked" data-level="2">
+                            <div class="level-status">BLOQUEADO</div>
+                            <div class="level-number">2</div>
+                            <h4>MAR ABIERTO</h4>
+                            <p>ODS 14: Vida Submarina</p>
+                            <p>Objetivo: 250 ptos</p>
+                            <button class="btn btn-small" disabled>🔒 BLOQUEADO</button>
+                        </div>
+                        <div class="level-card level-card-locked" data-level="3">
+                            <div class="level-number">3</div>
+                            <div class="level-status">BLOQUEADO</div>
+                            <h4>PROFUNDIDADES</h4>
+                            <p>ODS 14: Vida Submarina</p>
+                            <p>Objetivo: 500 ptos</p>
+                            <button class="btn btn-small" disabled>🔒 BLOQUEADO</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contenedor del Juego (oculto inicialmente) -->
+            <div id="game-container-panel" class="panel game-panel hidden">
+                <div class="panel-header">
+                    <h2>>> MISIÓN: ECO-SORT - OBJETIVO <span id="current-level">1</span></h2>
+                    <span id="back-to-levels" class="back-btn">← OBJETIVOS</span>
+                </div>
+                <div class="panel-body game-container">
+                    <canvas id="gameCanvas" width="800" height="400"></canvas>
+                    <div class="game-ui">
+                        <div class="hud-item">PUNTOS: <span id="score">0</span></div>
+                        <div class="hud-item">TIEMPO: <span id="time">00:00</span></div>
+                    </div>
+                    <div id="game-overlay" class="overlay">
+                        <h3>¿LISTO PARA COMENZAR?</h3>
+                        <p>Pulsa ENTER para iniciar la misión</p>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <footer>
+        <p>CONCIENCIACIÓN AMBIENTAL: ACTIVA | © 2024 Eco Project</p>
+    </footer>
+
+    <script src="js/scripts.js"></script>
+
+</body>
+
+</html>
