@@ -197,6 +197,19 @@ document.addEventListener('DOMContentLoaded', () => {
                         window.currentGameMode = 'park';
                         // Direct Start for Park Cleaner
                         showGame('park');
+                    } else if (gameName === 'forest-save') {
+                        if (gameTitle) gameTitle.textContent = 'BOSQUE EN PELIGRO';
+                        if (levelSuffix) levelSuffix.style.display = 'none';
+                        if (integrityHud) integrityHud.style.display = 'block';
+                        if (controls) controls.innerHTML = 'WASD/Flechas: Mover | Toca el FUEGO para apagarlo';
+                        if (instruction) instruction.textContent = '¡Salva el bosque de los incendios forestales!';
+
+                        // Stop others
+                        if (window.EcoSortGame) window.EcoSortGame.stop();
+                        if (window.ParkGame) window.ParkGame.stop();
+
+                        window.currentGameMode = 'forest';
+                        showGame('forest');
                     }
                 });
             }
@@ -210,6 +223,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (mode === 'park') {
             if (window.ParkGame) window.ParkGame.start();
+        } else if (mode === 'forest') {
+            if (window.ForestGame) window.ForestGame.start();
         } else {
             // mode is numeric level for Eco-Sort
             const level = parseInt(mode);
