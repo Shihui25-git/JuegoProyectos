@@ -181,11 +181,11 @@
                             <p>Clasifica los residuos correctamente contrarreloj.</p>
                             <button class="btn btn-small">JUGAR</button>
                         </div>
-                        <div class="game-card game-card-locked">
-                            <div class="game-card-icon">🚧</div>
-                            <h4>PRÓXIMAMENTE</h4>
-                            <p>Más juegos en desarrollo...</p>
-                            <button class="btn btn-small" disabled>BLOQUEADO</button>
+                        <div class="game-card" data-game="park-cleaner">
+                            <div class="game-card-icon">🗑️</div>
+                            <h4>PARQUE LIMPIO</h4>
+                            <p>Limpia el parque contrarreloj.</p>
+                            <button class="btn btn-small">JUGAR</button>
                         </div>
                         <div class="game-card game-card-locked">
                             <div class="game-card-icon">🔒</div>
@@ -197,7 +197,7 @@
                 </div>
             </div>
 
-            <!-- LEVEL SELECTION MENU -->
+            <!-- LEVEL SELECTION MENU (Existing) -->
             <div id="level-menu" class="panel hidden">
                 <div class="panel-header">
                     <h2>&gt;&gt; ECO-SORT: SELECCIONA OBJETIVO</h2>
@@ -233,22 +233,26 @@
             <!-- GAME CONTAINER -->
             <div id="game-container-panel" class="panel game-panel hidden">
                 <div class="panel-header">
-                    <h2>&gt;&gt; MISIÓN: ECO-SORT - OBJETIVO <span id="current-level">1</span></h2>
+                    <h2>&gt;&gt; MISIÓN: <span id="game-title">ECO-SORT</span> <span id="level-suffix">- OBJETIVO <span
+                                id="current-level">1</span></span></h2>
                     <span id="back-to-levels" class="back-btn" style="cursor:pointer;">← MENÚ</span>
                 </div>
                 <div class="panel-body game-container">
                     <canvas id="gameCanvas" width="800" height="400"
-                        style="background: url('assets/ocean_bg.svg'); background-size: cover; border-radius: 8px;"></canvas>
+                        style="background: #000; border-radius: 8px;"></canvas>
                     <div class="game-ui">
-                        <div class="hud-item">LIMPIEZA: <span id="score">0</span> / 100 ptos</div>
-                        <div class="hud-item">TIEMPO: <span id="time">2:00</span></div>
-                        <div class="hud-item">INTEGRIDAD: <span id="lives">4</span></div>
+                        <div class="hud-item"><span id="score-label">PUNTOS:</span> <span id="score">0</span><span
+                                id="score-goal"></span></div>
+                        <div class="hud-item">TIEMPO: <span id="time">0:00</span></div>
+                        <div id="integrity-hud" class="hud-item">INTEGRIDAD: <span id="lives">4</span></div>
                     </div>
                     <div id="game-overlay" class="overlay">
                         <h3>PULSA ENTER PARA EMPEZAR</h3>
-                        <p>A: Izquierda | D: Derecha</p>
-                        <p style="color: var(--accent-color); font-size: 14px; font-weight: bold;">¡Recoge la BASURA
-                            para limpiar el mar y evita a los ANIMALES!</p>
+                        <p id="game-controls">A: Izquierda | D: Derecha</p>
+                        <p id="game-instruction"
+                            style="color: var(--accent-color); font-size: 14px; font-weight: bold;">¡Recoge los
+                            RESIDUOS!
+                        </p>
                     </div>
                 </div>
             </div>
@@ -261,6 +265,7 @@
     </footer>
 
     <script src="js/game.js"></script>
+    <script src="js/park_game.js"></script>
     <script src="js/scripts.js"></script>
 
 </body>

@@ -165,16 +165,61 @@ document.addEventListener('DOMContentLoaded', () => {
             if (playBtn) {
                 playBtn.addEventListener('click', () => {
                     const gameName = card.getAttribute('data-game');
+                    const gameTitle = document.getElementById('game-title');
+                    const levelSuffix = document.getElementById('level-suffix');
+                    const integrityHud = document.getElementById('integrity-hud');
+                    const controls = document.getElementById('game-controls');
+                    const instruction = document.getElementById('game-instruction');
+
                     if (gameName === 'cyber-runner') {
-                        // Direct Start Level 1
-                        showGame(1);
+                        if (gameTitle) gameTitle.textContent = 'ECO-SORT';
+                        if (levelSuffix) levelSuffix.style.display = 'inline';
+                        if (integrityHud) integrityHud.style.display = 'block';
+                        if (controls) controls.textContent = 'A: Izquierda | D: Derecha';
+                        if (instruction) instruction.textContent = '¡Recoge los RESIDUOS para limpiar el mar!';
+
+                        // Stop Park Game if running
+                        if (window.ParkGame) window.ParkGame.stop();
+
+                        window.currentGameMode = 'eco';
+                        // Show level menu for ECO-SORT
+                        showLevelMenu();
+                    } else if (gameName === 'park-cleaner') {
+                        if (gameTitle) gameTitle.textContent = 'PARQUE LIMPIO';
+                        if (levelSuffix) levelSuffix.style.display = 'none';
+                        if (integrityHud) integrityHud.style.display = 'none';
+                        if (controls) controls.innerHTML = 'WASD/Flechas: Mover | Espacio: Recoger | E: Depositar';
+                        if (instruction) instruction.textContent = '¡Limpia el parque antes de que acabe el tiempo!';
+
+                        // Stop Eco-Sort if running
+                        if (window.EcoSortGame) window.EcoSortGame.stop();
+
+                        window.currentGameMode = 'park';
+                        // Direct Start for Park Cleaner
+                        showGame('park');
                     }
                 });
             }
         });
     }
 
-    // START GAME (Level 1)
+    function showGame(mode) {
+        if (gameMenu) gameMenu.classList.add('hidden');
+        if (levelMenu) levelMenu.classList.add('hidden');
+        if (gameContainerPanel) gameContainerPanel.classList.remove('hidden');
+
+        if (mode === 'park') {
+            if (window.ParkGame) window.ParkGame.start();
+        } else {
+            // mode is numeric level for Eco-Sort
+            const level = parseInt(mode);
+            selectedLevel = level;
+            if (currentLevelSpan) currentLevelSpan.textContent = level;
+            if (typeof setLevel === 'function') setLevel(level);
+        }
+    }
+
+    // START GAME ECO-SORT (Level 1 from level menu)
     const level1Btn = document.querySelector('.level-card[data-level="1"] button');
     if (level1Btn) {
         level1Btn.addEventListener('click', () => {
