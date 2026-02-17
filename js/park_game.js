@@ -6,7 +6,7 @@
 const ParkGame = (() => {
     // --- CONFIGURACIÓN ---
     const CONFIG = {
-        totalTime: 60,
+        totalTime: 30,
         winScore: 15,
         moveStep: 40,
         colors: {
@@ -186,8 +186,8 @@ const ParkGame = (() => {
         // Nivel HUD en Canvas
         ctx.fillStyle = 'rgba(255,255,255,0.8)';
         ctx.font = 'bold 18px Rajdhani';
-        ctx.textAlign = 'left';
-        ctx.fillText(`NIVEL ${state.level}`, 20, 25);
+        ctx.textAlign = 'center';
+        ctx.fillText(`NIVEL ${state.level}`, 400, 25);
     }
 
     function updateHUD() {
