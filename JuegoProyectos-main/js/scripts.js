@@ -217,7 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         showGame('forest');
                     } else if (gameName === 'recycling-hero') {
                         if (gameTitle) gameTitle.textContent = 'HÉROE DEL RECICLAJE';
-                        if (levelSuffix) levelSuffix.style.display = 'none';
+                        if (levelSuffix) levelSuffix.style.display = 'inline';
                         if (integrityHud) integrityHud.style.display = 'block';
                         if (controls) controls.innerHTML = 'A / ← : RECICLABLE | D / → : NO RECICLABLE';
                         if (instruction) instruction.textContent = '¡Clasifica las palabras rápidamente!';
