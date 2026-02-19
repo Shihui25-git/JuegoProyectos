@@ -180,6 +180,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
                         // Stop Park Game if running
                         if (window.ParkGame) window.ParkGame.stop();
+                        if (window.ForestGame) window.ForestGame.stop();
+                        if (window.RecyclingHeroGame) window.RecyclingHeroGame.stop();
 
                         window.currentGameMode = 'eco';
                         // Show level menu for ECO-SORT
@@ -193,6 +195,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
                         // Stop Eco-Sort if running
                         if (window.EcoSortGame) window.EcoSortGame.stop();
+                        if (window.ForestGame) window.ForestGame.stop();
+                        if (window.RecyclingHeroGame) window.RecyclingHeroGame.stop();
 
                         window.currentGameMode = 'park';
                         // Direct Start for Park Cleaner
@@ -207,9 +211,24 @@ document.addEventListener('DOMContentLoaded', () => {
                         // Stop others
                         if (window.EcoSortGame) window.EcoSortGame.stop();
                         if (window.ParkGame) window.ParkGame.stop();
+                        if (window.RecyclingHeroGame) window.RecyclingHeroGame.stop();
 
                         window.currentGameMode = 'forest';
                         showGame('forest');
+                    } else if (gameName === 'recycling-hero') {
+                        if (gameTitle) gameTitle.textContent = 'HÉROE DEL RECICLAJE';
+                        if (levelSuffix) levelSuffix.style.display = 'none';
+                        if (integrityHud) integrityHud.style.display = 'block';
+                        if (controls) controls.innerHTML = 'A / ← : RECICLABLE | D / → : NO RECICLABLE';
+                        if (instruction) instruction.textContent = '¡Clasifica las palabras rápidamente!';
+
+                        // Stop others
+                        if (window.EcoSortGame) window.EcoSortGame.stop();
+                        if (window.ParkGame) window.ParkGame.stop();
+                        if (window.ForestGame) window.ForestGame.stop();
+
+                        window.currentGameMode = 'recycling';
+                        showGame('recycling');
                     }
                 });
             }
@@ -225,6 +244,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (window.ParkGame) window.ParkGame.start();
         } else if (mode === 'forest') {
             if (window.ForestGame) window.ForestGame.start();
+        } else if (mode === 'recycling') {
+            if (window.RecyclingHeroGame) window.RecyclingHeroGame.start();
         } else {
             // mode is numeric level for Eco-Sort
             const level = parseInt(mode);
