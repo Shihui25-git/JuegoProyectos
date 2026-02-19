@@ -53,7 +53,7 @@ const RecyclingHeroGame = (() => {
             if (gameState === 'playing') {
                 timeLeft--;
                 if (timeLeft <= 0) {
-                    nextLevel();
+                    endGame("¡TIEMPO AGOTADO!");
                 }
             }
         }, 1000);
@@ -219,15 +219,15 @@ const RecyclingHeroGame = (() => {
         overlay.querySelector('p').innerText = "Has alcanzado 60 puntos.\n¡Felicidades, Héroe del Reciclaje!\nPulsa ENTER para jugar de nuevo";
     }
 
-    function endGame() {
+    function endGame(reason = "FIN DEL JUEGO") {
         running = false;
         gameState = 'ended';
         if (timerInterval) clearInterval(timerInterval);
         const overlay = document.getElementById('game-overlay');
         overlay.classList.remove('hidden');
-        overlay.querySelector('h3').innerText = "FIN DEL JUEGO";
+        overlay.querySelector('h3').innerText = reason;
         overlay.querySelector('h3').style.color = "#ff4d4d";
-        overlay.querySelector('p').innerText = "Puntuación Final: " + score + "\nNivel alcanzado: " + level + "\nPulsa ENTER para reintentar";
+        overlay.querySelector('p').innerText = "Puntuación Final: " + score + "\nPulsa ENTER para reintentar";
     }
 
     function updateHUD() {
