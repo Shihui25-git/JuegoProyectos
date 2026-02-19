@@ -6,9 +6,6 @@ const RecyclingHeroGame = (() => {
     let running = false;
     let score = 0;
     let lives = 3;
-    let level = 1;
-    let timeLeft = 30;
-    let timerInterval = null;
     let currentWord = null;
     let wordTimer = 0;
     let gameState = 'waiting'; // 'waiting', 'playing', 'ended'
@@ -16,17 +13,13 @@ const RecyclingHeroGame = (() => {
     const RECYCLABLE_WORDS = [
         "PAPEL", "CARTÓN", "BOTELLA VIDRIO", "LATA ALUMÍNIO",
         "BRICK", "REVISTA", "PERIÓDICO", "CAJA PIZZA (LIMPIA)",
-        "BOTE PLÁSTICO", "BOLSA PAPEL", "TAPA METAL", "PILAS",
-        "FOLLETO", "ENVASE YOGUR", "CORCHO BLANCO", "TARRO CRISTAL",
-        "PERIÓDICO VIEJO", "LATA REFRESCO", "CAJA CEREALES", "REVISTA MODA"
+        "BOTE PLÁSTICO", "BOLSA PAPEL", "TAPA METAL"
     ];
 
     const NON_RECYCLABLE_WORDS = [
         "PAÑAL", "COLILLA", "CERÁMICA", "CRISTAL ROTO",
         "RESTO COMIDA", "SERVILLETA SUCIA", "MASCARILLA",
-        "BOLÍGRAFO", "CHICLE", "ESPEJO", "BOMBILLA",
-        "JUGUETE PLÁSTICO", "PEINE", "CEPILLO DIENTES",
-        "FOTOGRAFÍA", "RADIOGRAFÍA", "CÁPSULA CAFÉ", "CELOFÁN"
+        "BOLÍGRAFO", "PILAS", "CHICLE"
     ];
 
     function initCanvas() {
@@ -42,32 +35,10 @@ const RecyclingHeroGame = (() => {
         running = true;
         score = 0;
         lives = 3;
-        level = 1;
-        timeLeft = 30;
         gameState = 'playing';
         nextWord();
         document.getElementById('game-overlay').classList.add('hidden');
-
-        if (timerInterval) clearInterval(timerInterval);
-        timerInterval = setInterval(() => {
-            if (gameState === 'playing') {
-                timeLeft--;
-                if (timeLeft <= 0) {
-                    endGame("¡TIEMPO AGOTADO!");
-                }
-            }
-        }, 1000);
-
         loop();
-    }
-
-    function nextLevel() {
-        level++;
-        timeLeft = 30;
-        // Aumentar dificultad si se desea, por ahora el score ya lo hace 
-        // pero podemos darle un bonus o mensaje
-        flashScreen('rgba(255, 255, 255, 0.2)');
-        console.log("Nivel " + level);
     }
 
     function nextWord() {
@@ -80,7 +51,7 @@ const RecyclingHeroGame = (() => {
             isRecyclable: isRecyclable,
             y: -50,
             x: 400,
-            speed: 2 + (score / 100) + (level * 0.5)
+            speed: 2 + (score / 100)
         };
     }
 
@@ -194,11 +165,7 @@ const RecyclingHeroGame = (() => {
             // Success!
             score += 10;
             flashScreen('rgba(0, 255, 0, 0.2)');
-            if (score >= 60) {
-                winGame();
-            } else {
-                nextWord();
-            }
+            nextWord();
         } else {
             // Fail!
             lives--;
@@ -208,24 +175,12 @@ const RecyclingHeroGame = (() => {
         }
     }
 
-    function winGame() {
+    function endGame() {
         running = false;
         gameState = 'ended';
-        if (timerInterval) clearInterval(timerInterval);
         const overlay = document.getElementById('game-overlay');
         overlay.classList.remove('hidden');
-        overlay.querySelector('h3').innerText = "¡VICTORIA!";
-        overlay.querySelector('h3').style.color = "#2ecc71";
-        overlay.querySelector('p').innerText = "Has alcanzado 60 puntos.\n¡Felicidades, Héroe del Reciclaje!\nPulsa ENTER para jugar de nuevo";
-    }
-
-    function endGame(reason = "FIN DEL JUEGO") {
-        running = false;
-        gameState = 'ended';
-        if (timerInterval) clearInterval(timerInterval);
-        const overlay = document.getElementById('game-overlay');
-        overlay.classList.remove('hidden');
-        overlay.querySelector('h3').innerText = reason;
+        overlay.querySelector('h3').innerText = "FIN DEL JUEGO";
         overlay.querySelector('h3').style.color = "#ff4d4d";
         overlay.querySelector('p').innerText = "Puntuación Final: " + score + "\nPulsa ENTER para reintentar";
     }
@@ -236,18 +191,9 @@ const RecyclingHeroGame = (() => {
         const livesEl = document.getElementById('lives');
         if (livesEl) livesEl.innerText = lives;
 
+        // Time isn't used here but let's clear it
         const timeEl = document.getElementById('time');
-        if (timeEl) {
-            const mins = Math.floor(timeLeft / 60);
-            const secs = timeLeft % 60;
-            timeEl.innerText = `${mins}:${secs.toString().padStart(2, '0')}`;
-        }
-
-        const levelEl = document.getElementById('current-level');
-        if (levelEl) levelEl.innerText = level;
-
-        const goalEl = document.getElementById('score-goal');
-        if (goalEl) goalEl.innerText = " / 60";
+        if (timeEl) timeEl.innerText = "--:--";
     }
 
     function flashScreen(color) {
@@ -275,11 +221,7 @@ const RecyclingHeroGame = (() => {
 
     return {
         start: startGame,
-        stop: () => {
-            running = false;
-            gameState = 'waiting';
-            if (timerInterval) clearInterval(timerInterval);
-        }
+        stop: () => { running = false; gameState = 'waiting'; }
     };
 })();
 
