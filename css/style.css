@@ -1019,8 +1019,7 @@ canvas {
     background: linear-gradient(to bottom, #006994 0%, #001e36 100%);
     /* Lighter Sea Blue top to Dark bottom */
     box-shadow: 0 0 10px rgba(0, 255, 65, 0.1);
-    image-rendering: pixelated;
-    /* Para estilo retro */
+    /* Para estilo retro - desactivado porque volvía borrosos los emojis */
     width: 100%;
     max-width: 800px;
     display: block;
