@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const gameMenu = document.getElementById('game-menu');
     const levelMenu = document.getElementById('level-menu');
     const gameContainerPanel = document.getElementById('game-container-panel');
+    const plasticChallengePanel = document.getElementById('plastic-challenge-panel');
     const gameCards = document.querySelectorAll('.game-card:not(.game-card-locked)');
     const backToGamesBtn = document.getElementById('back-to-games');
     const backToLevelsBtn = document.getElementById('back-to-levels');
@@ -51,12 +52,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (gameMenu) gameMenu.classList.remove('hidden');
         if (levelMenu) levelMenu.classList.add('hidden');
         if (gameContainerPanel) gameContainerPanel.classList.add('hidden');
+        if (plasticChallengePanel) plasticChallengePanel.classList.add('hidden');
     }
 
     function showLevelMenu() {
         if (gameMenu) gameMenu.classList.add('hidden');
         if (levelMenu) levelMenu.classList.remove('hidden');
         if (gameContainerPanel) gameContainerPanel.classList.add('hidden');
+        if (plasticChallengePanel) plasticChallengePanel.classList.add('hidden');
         updateLevelMenuUI();
     }
 
@@ -178,6 +181,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (controls) controls.textContent = 'A: Izquierda | D: Derecha';
                         if (instruction) instruction.textContent = '¡Recoge los RESIDUOS para limpiar el mar!';
 
+                        const timeHud = document.querySelector('.hud-item:nth-child(2)');
+                        if (timeHud) timeHud.innerHTML = 'TIEMPO: <span id="time">0:00</span>';
+                        const scoreLabel = document.getElementById('score-label');
+                        if (scoreLabel) scoreLabel.textContent = 'PUNTOS:';
+
                         // Stop Park Game if running
                         if (window.ParkGame) window.ParkGame.stop();
                         if (window.ForestGame) window.ForestGame.stop();
@@ -192,6 +200,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (integrityHud) integrityHud.style.display = 'none';
                         if (controls) controls.innerHTML = 'WASD/Flechas: Mover | Espacio: Recoger | E: Depositar';
                         if (instruction) instruction.textContent = '¡Limpia el parque antes de que acabe el tiempo!';
+
+                        const timeHud = document.querySelector('.hud-item:nth-child(2)');
+                        if (timeHud) timeHud.innerHTML = 'TIEMPO: <span id="time">0:00</span>';
+                        const scoreLabel = document.getElementById('score-label');
+                        if (scoreLabel) scoreLabel.textContent = 'PUNTOS:';
 
                         // Stop Eco-Sort if running
                         if (window.EcoSortGame) window.EcoSortGame.stop();
@@ -208,6 +221,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (controls) controls.innerHTML = 'WASD/Flechas: Mover | Toca el FUEGO para apagarlo';
                         if (instruction) instruction.textContent = '¡Salva el bosque de los incendios forestales!';
 
+                        const timeHud = document.querySelector('.hud-item:nth-child(2)');
+                        if (timeHud) timeHud.innerHTML = 'TIEMPO: <span id="time">0:00</span>';
+                        const scoreLabel = document.getElementById('score-label');
+                        if (scoreLabel) scoreLabel.textContent = 'PUNTOS:';
+
                         // Stop others
                         if (window.EcoSortGame) window.EcoSortGame.stop();
                         if (window.ParkGame) window.ParkGame.stop();
@@ -222,6 +240,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (controls) controls.innerHTML = 'A / ← : RECICLABLE | D / → : NO RECICLABLE';
                         if (instruction) instruction.textContent = '¡Clasifica las palabras rápidamente!';
 
+                        const timeHud = document.querySelector('.hud-item:nth-child(2)');
+                        if (timeHud) timeHud.innerHTML = 'TIEMPO: <span id="time">0:00</span>';
+                        const scoreLabel = document.getElementById('score-label');
+                        if (scoreLabel) scoreLabel.textContent = 'PUNTOS:';
+
                         // Stop others
                         if (window.EcoSortGame) window.EcoSortGame.stop();
                         if (window.ParkGame) window.ParkGame.stop();
@@ -229,6 +252,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
                         window.currentGameMode = 'recycling';
                         showGame('recycling');
+                    } else if (gameName === 'plastic-challenge') {
+                        // Stop all others
+                        if (window.EcoSortGame) window.EcoSortGame.stop();
+                        if (window.ParkGame) window.ParkGame.stop();
+                        if (window.ForestGame) window.ForestGame.stop();
+                        if (window.RecyclingHeroGame) window.RecyclingHeroGame.stop();
+
+                        if (gameMenu) gameMenu.classList.add('hidden');
+                        if (levelMenu) levelMenu.classList.add('hidden');
+                        if (gameContainerPanel) gameContainerPanel.classList.add('hidden');
+                        if (plasticChallengePanel) plasticChallengePanel.classList.remove('hidden');
+
+                        if (window.PlasticChallenge) window.PlasticChallenge.reset();
+                    } else if (gameName === 'traffic-control') {
+                        if (gameTitle) gameTitle.textContent = 'CONTROL DE TRÁFICO';
+                        if (levelSuffix) levelSuffix.style.display = 'none';
+                        if (integrityHud) integrityHud.style.display = 'block';
+
+                        const timeHud = document.querySelector('.hud-item:nth-child(2)');
+                        if (timeHud) timeHud.innerHTML = 'ESTADO: <span id="time">0%</span>';
+
+                        const scoreLabel = document.getElementById('score-label');
+                        if (scoreLabel) scoreLabel.textContent = 'SOSTENIBILIDAD:';
+
+                        if (controls) controls.innerHTML = 'ESPACIO: Cambiar Semáforos | Prioriza Bicis y Buses';
+                        if (instruction) instruction.textContent = '¡Evita la contaminación y las colisiones!';
+
+                        // Stop others
+                        if (window.EcoSortGame) window.EcoSortGame.stop();
+                        if (window.ParkGame) window.ParkGame.stop();
+                        if (window.ForestGame) window.ForestGame.stop();
+                        if (window.RecyclingHeroGame) window.RecyclingHeroGame.stop();
+
+                        window.currentGameMode = 'traffic';
+                        showGame('traffic');
                     }
                 });
             }
@@ -246,6 +304,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (window.ForestGame) window.ForestGame.start();
         } else if (mode === 'recycling') {
             if (window.RecyclingHeroGame) window.RecyclingHeroGame.start();
+        } else if (mode === 'traffic') {
+            if (window.TrafficControlGame) window.TrafficControlGame.start();
         } else {
             // mode is numeric level for Eco-Sort
             const level = parseInt(mode);
