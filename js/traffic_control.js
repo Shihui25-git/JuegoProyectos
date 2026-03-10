@@ -32,6 +32,21 @@ const TrafficControlGame = (() => {
         return !!ctx;
     }
 
+    function initMenu() {
+        if (!initCanvas()) return;
+        running = false;
+        gameState = 'waiting';
+        const overlay = document.getElementById('game-overlay');
+        overlay.classList.remove('hidden');
+        overlay.querySelector('h3').innerText = "PULSA ENTER PARA EMPEZAR";
+        overlay.querySelector('h3').style.color = "#fff";
+        overlay.querySelector('p').innerText = "Traffic Control: ¡Evita accidentes controlando los semáforos (Español o Click)!";
+
+        ctx.clearRect(0, 0, 800, 400);
+        drawBackground();
+        drawTrafficLights();
+    }
+
     function startGame() {
         if (!initCanvas()) return;
         running = true;
@@ -44,6 +59,7 @@ const TrafficControlGame = (() => {
         spawnTimer = 0;
         document.getElementById('game-overlay').classList.add('hidden');
 
+        lastTime = performance.now();
         requestAnimationFrame(loop);
     }
 
@@ -372,6 +388,7 @@ const TrafficControlGame = (() => {
 
     return {
         start: startGame,
+        initMenu: initMenu,
         stop: () => {
             running = false;
             gameState = 'waiting';

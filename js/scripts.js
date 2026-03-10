@@ -10,7 +10,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Referencias a menús de arcade
     const gameMenu = document.getElementById('game-menu');
-    const levelMenu = document.getElementById('level-menu');
     const gameContainerPanel = document.getElementById('game-container-panel');
     const gameCards = document.querySelectorAll('.game-card:not(.game-card-locked)');
     const backToGamesBtn = document.getElementById('back-to-games');
@@ -47,15 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function showGameMenu() {
         if (gameMenu) gameMenu.classList.remove('hidden');
-        if (levelMenu) levelMenu.classList.add('hidden');
         if (gameContainerPanel) gameContainerPanel.classList.add('hidden');
-    }
-
-    function showLevelMenu() {
-        if (gameMenu) gameMenu.classList.add('hidden');
-        if (levelMenu) levelMenu.classList.remove('hidden');
-        if (gameContainerPanel) gameContainerPanel.classList.add('hidden');
-        updateLevelMenuUI();
     }
 
     function showGame(level) {
@@ -70,54 +61,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (gameMenu) gameMenu.classList.add('hidden');
-        if (levelMenu) levelMenu.classList.add('hidden');
         if (gameContainerPanel) gameContainerPanel.classList.remove('hidden');
     }
 
     function updateLevelMenuUI() {
-        // Cargar progreso (maxLevelUnlocked)
-        let maxUnlocked = 1;
-        const saved = localStorage.getItem('ecoSortProgress');
-        if (saved) {
-            try {
-                const progress = JSON.parse(saved);
-                maxUnlocked = progress.maxLevelUnlocked || 1;
-            } catch (e) { console.error("Error parsing progress", e); }
-        }
-
-        console.log("Updating UI for Levels. Max Unlocked:", maxUnlocked);
-
-        const allLevelCards = document.querySelectorAll('.level-card');
-        allLevelCards.forEach(card => {
-            const level = parseInt(card.getAttribute('data-level'));
-            const btn = card.querySelector('.btn');
-            const statusLabel = card.querySelector('.level-status');
-
-            // Logic adapted to new HTML structure provided
-            if (level < maxUnlocked) {
-                card.classList.remove('level-card-locked');
-                // card.classList.add('completed');
-                if (statusLabel) statusLabel.textContent = 'COMPLETADO';
-                if (btn) {
-                    btn.disabled = false;
-                    btn.textContent = 'REPETIR';
-                }
-            } else if (level === maxUnlocked) {
-                card.classList.remove('level-card-locked');
-                if (statusLabel) statusLabel.textContent = 'DISPONIBLE';
-                if (btn) {
-                    btn.disabled = false;
-                    btn.textContent = 'EMPEZAR';
-                }
-            } else {
-                card.classList.add('level-card-locked');
-                if (statusLabel) statusLabel.textContent = 'BLOQUEADO';
-                if (btn) {
-                    btn.disabled = true;
-                    btn.textContent = '🔒 BLOQUEADO';
-                }
-            }
-        });
+        // Obsolete function since menu is removed, but we'll leave it empty to avoid errors globally if called
     }
 
     // --- EVENT LISTENERS ---
@@ -176,12 +124,15 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (controls) controls.textContent = 'A: Izquierda | D: Derecha';
                         if (instruction) instruction.textContent = '¡Recoge los RESIDUOS para limpiar el mar!';
 
-                        // Stop Park Game if running
-                        if (window.ParkGame) window.ParkGame.stop();
+                        // Stop others if running
+                        if (window.ParkGame && window.ParkGame.stop) window.ParkGame.stop();
+                        if (window.ForestGame && window.ForestGame.stop) window.ForestGame.stop();
+                        if (window.TrafficControlGame && window.TrafficControlGame.stop) window.TrafficControlGame.stop();
+                        if (window.RecyclingHeroGame && window.RecyclingHeroGame.stop) window.RecyclingHeroGame.stop();
 
                         window.currentGameMode = 'eco';
-                        // Show level menu for ECO-SORT
-                        showLevelMenu();
+                        // Direct Start for ECO-SORT Level 1
+                        showGame(1);
                     } else if (gameName === 'park-cleaner') {
                         if (gameTitle) gameTitle.textContent = 'PARQUE LIMPIO';
                         if (levelSuffix) levelSuffix.style.display = 'none';
@@ -189,8 +140,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (controls) controls.innerHTML = 'WASD/Flechas: Mover | Espacio: Recoger | E: Depositar';
                         if (instruction) instruction.textContent = '¡Limpia el parque antes de que acabe el tiempo!';
 
-                        // Stop Eco-Sort if running
-                        if (window.EcoSortGame) window.EcoSortGame.stop();
+                        // Stop others
+                        if (window.EcoSortGame && window.EcoSortGame.stop) window.EcoSortGame.stop();
+                        if (window.ForestGame && window.ForestGame.stop) window.ForestGame.stop();
+                        if (window.TrafficControlGame && window.TrafficControlGame.stop) window.TrafficControlGame.stop();
+                        if (window.RecyclingHeroGame && window.RecyclingHeroGame.stop) window.RecyclingHeroGame.stop();
 
                         window.currentGameMode = 'park';
                         // Direct Start for Park Cleaner
@@ -203,11 +157,43 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (instruction) instruction.textContent = '¡Salva el bosque de los incendios forestales!';
 
                         // Stop others
-                        if (window.EcoSortGame) window.EcoSortGame.stop();
-                        if (window.ParkGame) window.ParkGame.stop();
+                        if (window.EcoSortGame && window.EcoSortGame.stop) window.EcoSortGame.stop();
+                        if (window.ParkGame && window.ParkGame.stop) window.ParkGame.stop();
+                        if (window.TrafficControlGame && window.TrafficControlGame.stop) window.TrafficControlGame.stop();
+                        if (window.RecyclingHeroGame && window.RecyclingHeroGame.stop) window.RecyclingHeroGame.stop();
 
                         window.currentGameMode = 'forest';
                         showGame('forest');
+                    } else if (gameName === 'traffic-control') {
+                        if (gameTitle) gameTitle.textContent = 'Traffic Control';
+                        if (levelSuffix) levelSuffix.style.display = 'none';
+                        if (integrityHud) integrityHud.style.display = 'block';
+                        if (controls) controls.innerHTML = 'Espacio/Click: Cambiar Semáforos';
+                        if (instruction) instruction.textContent = '¡Evita accidentes y reduce la contaminación!';
+
+                        // Stop others
+                        if (window.EcoSortGame && window.EcoSortGame.stop) window.EcoSortGame.stop();
+                        if (window.ParkGame && window.ParkGame.stop) window.ParkGame.stop();
+                        if (window.ForestGame && window.ForestGame.stop) window.ForestGame.stop();
+                        if (window.RecyclingHeroGame && window.RecyclingHeroGame.stop) window.RecyclingHeroGame.stop();
+
+                        window.currentGameMode = 'traffic';
+                        showGame('traffic');
+                    } else if (gameName === 'recycling-hero') {
+                        if (gameTitle) gameTitle.textContent = 'Hero Recicling';
+                        if (levelSuffix) levelSuffix.style.display = 'none';
+                        if (integrityHud) integrityHud.style.display = 'block';
+                        if (controls) controls.innerHTML = 'Q,W,E,R: Clasificar Residuos';
+                        if (instruction) instruction.textContent = '¡Clasifica cada palabra antes de que caiga!';
+
+                        // Stop others
+                        if (window.EcoSortGame && window.EcoSortGame.stop) window.EcoSortGame.stop();
+                        if (window.ParkGame && window.ParkGame.stop) window.ParkGame.stop();
+                        if (window.ForestGame && window.ForestGame.stop) window.ForestGame.stop();
+                        if (window.TrafficControlGame && window.TrafficControlGame.stop) window.TrafficControlGame.stop();
+
+                        window.currentGameMode = 'recycling';
+                        showGame('recycling');
                     }
                 });
             }
@@ -216,43 +202,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function showGame(mode) {
         if (gameMenu) gameMenu.classList.add('hidden');
-        if (levelMenu) levelMenu.classList.add('hidden');
         if (gameContainerPanel) gameContainerPanel.classList.remove('hidden');
 
         if (mode === 'park') {
             if (window.ParkGame) window.ParkGame.start();
         } else if (mode === 'forest') {
             if (window.ForestGame) window.ForestGame.start();
+        } else if (mode === 'traffic') {
+            if (window.TrafficControlGame) window.TrafficControlGame.initMenu();
+        } else if (mode === 'recycling') {
+            if (window.RecyclingHeroGame) window.RecyclingHeroGame.start();
         } else {
             // mode is numeric level for Eco-Sort
             const level = parseInt(mode);
             selectedLevel = level;
             if (currentLevelSpan) currentLevelSpan.textContent = level;
             if (typeof setLevel === 'function') setLevel(level);
+
+            // We need to show the start screen overlay
+            const overlay = document.getElementById('game-overlay');
+            if (overlay) {
+                overlay.classList.remove('hidden');
+                const title = overlay.querySelector('h3');
+                const msg = overlay.querySelector('p');
+                title.innerText = "PULSA ENTER PARA EMPEZAR";
+                title.style.color = "#fff";
+                msg.innerText = "¡Recoge la basura (A/D o Flechas) y esquiva los obstáculos marinos!";
+            }
+
+            if (window.EcoSortGame) window.EcoSortGame.initMenu();
         }
     }
 
-    // START GAME ECO-SORT (Level 1 from level menu)
-    const level1Btn = document.querySelector('.level-card[data-level="1"] button');
-    if (level1Btn) {
-        level1Btn.addEventListener('click', () => {
-            showGame(1);
-        });
-    }
-
-    // Selección de nivel
-    if (levelMenu) {
-        levelMenu.addEventListener('click', (e) => {
-            const btn = e.target.closest('.btn');
-            if (btn && !btn.disabled) {
-                const card = btn.closest('.level-card');
-                if (card && !card.classList.contains('level-card-locked')) {
-                    const level = parseInt(card.getAttribute('data-level'));
-                    showGame(level);
-                }
-            }
-        });
-    }
+    // Eliminamos listeners huérfanos del levelMenu
 
     // Botones Volver
     if (backToGamesBtn) {
