@@ -130,6 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (window.TrafficControlGame && window.TrafficControlGame.stop) window.TrafficControlGame.stop();
                         if (window.RecyclingHeroGame && window.RecyclingHeroGame.stop) window.RecyclingHeroGame.stop();
                         if (window.EnergyGame && window.EnergyGame.stop) window.EnergyGame.stop();
+                        if (window.CalculoGame && window.CalculoGame.stop) window.CalculoGame.stop();
 
                         window.currentGameMode = 'eco';
                         // Direct Start for ECO-SORT Level 1
@@ -147,6 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (window.TrafficControlGame && window.TrafficControlGame.stop) window.TrafficControlGame.stop();
                         if (window.RecyclingHeroGame && window.RecyclingHeroGame.stop) window.RecyclingHeroGame.stop();
                         if (window.EnergyGame && window.EnergyGame.stop) window.EnergyGame.stop();
+                        if (window.CalculoGame && window.CalculoGame.stop) window.CalculoGame.stop();
 
                         window.currentGameMode = 'park';
                         // Direct Start for Park Cleaner
@@ -164,6 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (window.TrafficControlGame && window.TrafficControlGame.stop) window.TrafficControlGame.stop();
                         if (window.RecyclingHeroGame && window.RecyclingHeroGame.stop) window.RecyclingHeroGame.stop();
                         if (window.EnergyGame && window.EnergyGame.stop) window.EnergyGame.stop();
+                        if (window.CalculoGame && window.CalculoGame.stop) window.CalculoGame.stop();
 
                         window.currentGameMode = 'forest';
                         showGame('forest');
@@ -180,6 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (window.ForestGame && window.ForestGame.stop) window.ForestGame.stop();
                         if (window.RecyclingHeroGame && window.RecyclingHeroGame.stop) window.RecyclingHeroGame.stop();
                         if (window.EnergyGame && window.EnergyGame.stop) window.EnergyGame.stop();
+                        if (window.CalculoGame && window.CalculoGame.stop) window.CalculoGame.stop();
 
                         window.currentGameMode = 'traffic';
                         showGame('traffic');
@@ -196,6 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (window.ForestGame && window.ForestGame.stop) window.ForestGame.stop();
                         if (window.TrafficControlGame && window.TrafficControlGame.stop) window.TrafficControlGame.stop();
                         if (window.EnergyGame && window.EnergyGame.stop) window.EnergyGame.stop();
+                        if (window.CalculoGame && window.CalculoGame.stop) window.CalculoGame.stop();
 
                         window.currentGameMode = 'recycling';
                         showGame('recycling');
@@ -212,6 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (window.ForestGame && window.ForestGame.stop) window.ForestGame.stop();
                         if (window.TrafficControlGame && window.TrafficControlGame.stop) window.TrafficControlGame.stop();
                         if (window.RecyclingHeroGame && window.RecyclingHeroGame.stop) window.RecyclingHeroGame.stop();
+                        if (window.CalculoGame && window.CalculoGame.stop) window.CalculoGame.stop();
 
                         window.currentGameMode = 'energy';
                         showGame('energy');
