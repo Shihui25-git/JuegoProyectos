@@ -130,6 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (window.TrafficControlGame && window.TrafficControlGame.stop) window.TrafficControlGame.stop();
                         if (window.RecyclingHeroGame && window.RecyclingHeroGame.stop) window.RecyclingHeroGame.stop();
                         if (window.EnergyGame && window.EnergyGame.stop) window.EnergyGame.stop();
+                        if (window.CalculoGame && window.CalculoGame.stop) window.CalculoGame.stop();
 
                         window.currentGameMode = 'eco';
                         // Direct Start for ECO-SORT Level 1
@@ -147,6 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (window.TrafficControlGame && window.TrafficControlGame.stop) window.TrafficControlGame.stop();
                         if (window.RecyclingHeroGame && window.RecyclingHeroGame.stop) window.RecyclingHeroGame.stop();
                         if (window.EnergyGame && window.EnergyGame.stop) window.EnergyGame.stop();
+                        if (window.CalculoGame && window.CalculoGame.stop) window.CalculoGame.stop();
 
                         window.currentGameMode = 'park';
                         // Direct Start for Park Cleaner
@@ -164,6 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (window.TrafficControlGame && window.TrafficControlGame.stop) window.TrafficControlGame.stop();
                         if (window.RecyclingHeroGame && window.RecyclingHeroGame.stop) window.RecyclingHeroGame.stop();
                         if (window.EnergyGame && window.EnergyGame.stop) window.EnergyGame.stop();
+                        if (window.CalculoGame && window.CalculoGame.stop) window.CalculoGame.stop();
 
                         window.currentGameMode = 'forest';
                         showGame('forest');
@@ -180,6 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (window.ForestGame && window.ForestGame.stop) window.ForestGame.stop();
                         if (window.RecyclingHeroGame && window.RecyclingHeroGame.stop) window.RecyclingHeroGame.stop();
                         if (window.EnergyGame && window.EnergyGame.stop) window.EnergyGame.stop();
+                        if (window.CalculoGame && window.CalculoGame.stop) window.CalculoGame.stop();
 
                         window.currentGameMode = 'traffic';
                         showGame('traffic');
@@ -196,6 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (window.ForestGame && window.ForestGame.stop) window.ForestGame.stop();
                         if (window.TrafficControlGame && window.TrafficControlGame.stop) window.TrafficControlGame.stop();
                         if (window.EnergyGame && window.EnergyGame.stop) window.EnergyGame.stop();
+                        if (window.CalculoGame && window.CalculoGame.stop) window.CalculoGame.stop();
 
                         window.currentGameMode = 'recycling';
                         showGame('recycling');
@@ -212,9 +217,27 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (window.ForestGame && window.ForestGame.stop) window.ForestGame.stop();
                         if (window.TrafficControlGame && window.TrafficControlGame.stop) window.TrafficControlGame.stop();
                         if (window.RecyclingHeroGame && window.RecyclingHeroGame.stop) window.RecyclingHeroGame.stop();
+                        if (window.CalculoGame && window.CalculoGame.stop) window.CalculoGame.stop();
 
                         window.currentGameMode = 'energy';
                         showGame('energy');
+                    } else if (gameName === 'calculo-game') {
+                        if (gameTitle) gameTitle.textContent = 'Cálculo Rápido';
+                        if (levelSuffix) levelSuffix.style.display = 'none';
+                        if (integrityHud) integrityHud.style.display = 'block';
+                        if (controls) controls.innerHTML = 'Teclado/Ratón: Seleccionar respuesta';
+                        if (instruction) instruction.textContent = '¡Resuelve las operaciones lo más rápido posible!';
+
+                        // Stop others
+                        if (window.EcoSortGame && window.EcoSortGame.stop) window.EcoSortGame.stop();
+                        if (window.ParkGame && window.ParkGame.stop) window.ParkGame.stop();
+                        if (window.ForestGame && window.ForestGame.stop) window.ForestGame.stop();
+                        if (window.TrafficControlGame && window.TrafficControlGame.stop) window.TrafficControlGame.stop();
+                        if (window.RecyclingHeroGame && window.RecyclingHeroGame.stop) window.RecyclingHeroGame.stop();
+                        if (window.EnergyGame && window.EnergyGame.stop) window.EnergyGame.stop();
+
+                        window.currentGameMode = 'calculo';
+                        showGame('calculo');
                     }
                 });
             }
@@ -249,6 +272,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     msg.innerText = "¡Haz clic en las tuberías para conectarlas!";
                 }
                 if (window.EnergyGame) window.EnergyGame.start(1);
+                break;
+            case 'calculo':
+                const overlayCalculo = document.getElementById('game-overlay');
+                if (overlayCalculo) {
+                    overlayCalculo.classList.remove('hidden');
+                    const title = overlayCalculo.querySelector('h3');
+                    const msg = overlayCalculo.querySelector('p');
+                    title.innerText = "PULSA ENTER PARA EMPEZAR";
+                    title.style.color = "#fff";
+                    msg.innerText = "¡Resuelve las operaciones lo más rápido posible!";
+                }
+                if (window.CalculoGame) window.CalculoGame.start();
                 break;
             default:
                 // mode is numeric level for Eco-Sort
