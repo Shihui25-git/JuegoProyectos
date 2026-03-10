@@ -1,47 +1,152 @@
 /**
- * PARQUE LIMPIO: ROBOT RECICLADOR
- * Versión simplificada Estilo Robot Reciclador Original
+ * PARQUE LIMPIO: RECICLAJE CON RATÓN
+ * Versión de Arrastrar y Soltar con Contenedores
  */
 
 const ParkGame = (() => {
     // --- CONFIGURACIÓN ---
     const CONFIG = {
-        totalTime: 30,
+        totalTime: 60,
         winScore: 15,
-        moveStep: 40,
         colors: {
             grass: '#7CB342', path: '#8D6E63'
         },
         items: {
             trash: ["🍎", "🧴", "📄", "📦"],
-            hazard: ["🐈", "🌳", "🐕"] // Opcional para variedad
-        }
+            hazard: ["🐈", "🌳", "🐕"]
+        },
+        bins: [
+            { id: 'yellow', color: '#FFEB3B', textColor: '#000', accept: ["🧴", "📦"], x: 150, y: 300, w: 100, h: 90, label: "ENVASES" },
+            { id: 'blue', color: '#2196F3', textColor: '#FFF', accept: ["📄"], x: 350, y: 300, w: 100, h: 90, label: "PAPEL" },
+            { id: 'brown', color: '#795548', textColor: '#FFF', accept: ["🍎"], x: 550, y: 300, w: 100, h: 90, label: "ORGÁNICO" }
+        ]
     };
 
     // --- ESTADO ---
     let state = {
         active: false, score: 0, time: CONFIG.totalTime, level: 1, lives: 4,
-        items: [], player: { x: 400, y: 300 },
-        lastFrame: 0, floatingTexts: []
+        items: [],
+        lastFrame: 0, floatingTexts: [],
+        draggedItem: null
     };
 
     let canvas, ctx, animationFrameId;
+
+    // Almacenamos referencias a las funciones bindeables
+    let handlers = {};
 
     function init() {
         canvas = document.getElementById('gameCanvas');
         if (!canvas) return false;
         ctx = canvas.getContext('2d');
+
+        // Setup event listener bindings
+        handlers.mousedown = handleMouseDown;
+        handlers.mousemove = handleMouseMove;
+        handlers.mouseup = handleMouseUp;
+        handlers.mouseleave = handleMouseUp; // Handle dragging outside canvas
         return true;
     }
 
     function reset() {
         state.score = 0; state.time = CONFIG.totalTime; state.level = 1; state.lives = 4;
         state.items = []; state.floatingTexts = [];
-        state.player = { x: 400, y: 300 };
+        state.draggedItem = null;
         state.active = true;
 
-        window.removeEventListener('keydown', handleKeyDown);
-        window.addEventListener('keydown', handleKeyDown);
+        removeEvents();
+        addEvents();
+    }
+
+    function addEvents() {
+        canvas.addEventListener('mousedown', handlers.mousedown);
+        canvas.addEventListener('mousemove', handlers.mousemove);
+        canvas.addEventListener('mouseup', handlers.mouseup);
+        canvas.addEventListener('mouseleave', handlers.mouseleave);
+    }
+
+    function removeEvents() {
+        canvas.removeEventListener('mousedown', handlers.mousedown);
+        canvas.removeEventListener('mousemove', handlers.mousemove);
+        canvas.removeEventListener('mouseup', handlers.mouseup);
+        canvas.removeEventListener('mouseleave', handlers.mouseleave);
+    }
+
+    function getMousePos(e) {
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        return {
+            x: (e.clientX - rect.left) * scaleX,
+            y: (e.clientY - rect.top) * scaleY
+        };
+    }
+
+    function handleMouseDown(e) {
+        if (!state.active) return;
+        const pos = getMousePos(e);
+
+        // Check collision in reverse order to prefer top items (most recently spawned)
+        for (let i = state.items.length - 1; i >= 0; i--) {
+            const item = state.items[i];
+            const dist = Math.sqrt((pos.x - item.x) ** 2 + (pos.y - item.y) ** 2);
+            if (dist < 30) { // 30px hit radius
+                if (item.type === 'hazard') {
+                    // Clickeaste un hazard (gato, perro, árbol)
+                    state.lives--;
+                    showFloatingText("HP -1", item.x, item.y, '#F44336');
+                    state.items.splice(i, 1);
+                    if (state.lives <= 0) endGame(false);
+                } else {
+                    // Clickeaste una basura, start dragging
+                    state.draggedItem = item;
+                    // Mover el objeto arrastrado al final del array (dibujar encima)
+                    state.items.splice(i, 1);
+                    state.items.push(item);
+                }
+                break;
+            }
+        }
+    }
+
+    function handleMouseMove(e) {
+        if (!state.active || !state.draggedItem) return;
+        const pos = getMousePos(e);
+        state.draggedItem.x = pos.x;
+        state.draggedItem.y = pos.y;
+    }
+
+    function handleMouseUp(e) {
+        if (!state.active || !state.draggedItem) return;
+        const pos = getMousePos(e);
+
+        // Comprobar si soltamos sobre un contenedor
+        let overBin = null;
+        for (let b of CONFIG.bins) {
+            // Chequear si (pos.x, pos.y) está dentro del rect del contenedor
+            if (pos.x >= b.x && pos.x <= b.x + b.w &&
+                pos.y >= b.y && pos.y <= b.y + b.h) {
+                overBin = b;
+                break;
+            }
+        }
+
+        if (overBin) {
+            // Verificar si pertenece
+            if (overBin.accept.includes(state.draggedItem.icon)) {
+                state.score++;
+                showFloatingText("+1", pos.x, pos.y, '#4CAF50');
+            } else {
+                state.lives--;
+                showFloatingText("ERROR -1 HP", pos.x, pos.y, '#F44336');
+            }
+            // Destruir el item (está al final de state.items, ya que lo movimos en mousedown)
+            state.items.pop();
+            if (state.lives <= 0) endGame(false);
+            if (state.score >= CONFIG.winScore) endGame(true);
+        }
+
+        state.draggedItem = null;
     }
 
     function start() {
@@ -53,36 +158,14 @@ const ParkGame = (() => {
         document.getElementById('game-overlay').classList.add('hidden');
 
         // Reset HUD labels
-        document.getElementById('score-label').innerText = "PUNTOS:";
+        document.getElementById('score-label').innerText = "RECICLADO:";
         document.getElementById('score-goal').innerText = " / " + CONFIG.winScore;
     }
 
     function stop() {
         state.active = false;
         if (animationFrameId) cancelAnimationFrame(animationFrameId);
-        window.removeEventListener('keydown', handleKeyDown);
-    }
-
-    function handleKeyDown(e) {
-        if (!state.active) return;
-
-        const key = e.key.toLowerCase();
-        let oldX = state.player.x;
-        let oldY = state.player.y;
-
-        if (key === 'w' || key === 'arrowup') state.player.y -= CONFIG.moveStep;
-        if (key === 's' || key === 'arrowdown') state.player.y += CONFIG.moveStep;
-        if (key === 'a' || key === 'arrowleft') state.player.x -= CONFIG.moveStep;
-        if (key === 'd' || key === 'arrowright') state.player.x += CONFIG.moveStep;
-
-        // Limites
-        state.player.x = Math.max(30, Math.min(770, state.player.x));
-        state.player.y = Math.max(50, Math.min(370, state.player.y));
-
-        if (["Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.code)) e.preventDefault();
-
-        // Colisión inmediata post-movimiento
-        checkCollisions();
+        removeEvents();
     }
 
     function loop(timestamp) {
@@ -104,54 +187,65 @@ const ParkGame = (() => {
 
         // Movimiento de items según nivel
         state.items.forEach(item => {
-            if (state.level >= 2) {
-                item.x += item.dx * dt * 40;
-                if (item.x <= 30 || item.x >= 770) item.dx *= -1;
+            // No mover el item que está siendo arrastrado
+            if (item === state.draggedItem) return;
+
+            // Restringir el y máximo para que la basura no se solape demasiado con los contenedores
+            const maxY = 250;
+
+            // Level 2: Derecha a Izquierda
+            if (state.level === 2) {
+                item.x -= 100 * dt; // Mover a la izquierda constantemente
+                if (item.x < -50) item.x = 850; // Reaparecer por la derecha
             }
+
+            // Level 3: Arriba, abajo, derecha, izquierda (Rebote)
             if (state.level === 3) {
-                item.y += item.dy * dt * 40;
-                if (item.y <= 50 || item.y >= 370) item.dy *= -1;
+                item.x += item.dx * dt * 60;
+                item.y += item.dy * dt * 60;
+
+                // Rebote
+                if (item.x <= 30 || item.x >= 770) item.dx *= -1;
+                if (item.y <= 50 || item.y >= maxY) item.dy *= -1;
             }
         });
 
-        if (state.items.length < 8 && Math.random() < 0.02) spawnItem();
-
-        checkCollisions();
+        // Aumentar cantidad de objetos
+        let maxItems = (state.level === 1) ? 6 : (state.level === 2 ? 8 : 12);
+        if (state.items.length < maxItems && Math.random() < 0.05) spawnItem();
 
         state.floatingTexts.forEach((ft, i) => { ft.y -= 40 * dt; ft.life -= dt; if (ft.life <= 0) state.floatingTexts.splice(i, 1); });
         updateHUD();
     }
 
     function spawnItem() {
-        const isHazard = Math.random() < 0.1;
+        const isHazard = Math.random() < 0.2; // Un poco más de oportunidad de hazard
         const type = isHazard ? 'hazard' : 'trash';
         const icons = CONFIG.items[type];
+
+        let x, y, dx, dy;
+        const maxY = 250; // No spawnear sobre los contenedores
+
+        if (state.level === 2) {
+            x = 850; // Start off-screen right
+            y = Math.random() * (maxY - 50) + 50;
+            dx = 0;
+            dy = 0;
+        } else {
+            x = Math.random() * 700 + 50;
+            y = Math.random() * (maxY - 80) + 80;
+            dx = (Math.random() > 0.5 ? 1 : -1) * (1 + Math.random());
+            dy = (Math.random() > 0.5 ? 1 : -1) * (1 + Math.random());
+        }
+
         state.items.push({
             id: Math.random(),
             type: type,
             icon: icons[Math.floor(Math.random() * icons.length)],
-            x: Math.random() * 700 + 50,
-            y: Math.random() * 250 + 80,
-            dx: (Math.random() > 0.5 ? 1 : -1) * (1 + Math.random()),
-            dy: (Math.random() > 0.5 ? 1 : -1) * (1 + Math.random())
-        });
-    }
-
-    function checkCollisions() {
-        state.items.forEach((item, index) => {
-            const dist = Math.sqrt((state.player.x - item.x) ** 2 + (state.player.y - item.y) ** 2);
-            if (dist < 40) {
-                if (item.type === 'hazard') {
-                    state.lives--;
-                    showFloatingText("HP -1", item.x, item.y, '#F44336');
-                    if (state.lives <= 0) endGame(false);
-                } else {
-                    state.score++;
-                    showFloatingText("+1", item.x, item.y, '#4CAF50');
-                }
-                state.items.splice(index, 1);
-                if (state.score >= CONFIG.winScore) endGame(true);
-            }
+            x: x,
+            y: y,
+            dx: dx,
+            dy: dy
         });
     }
 
@@ -162,24 +256,80 @@ const ParkGame = (() => {
         ctx.fillStyle = CONFIG.colors.grass; ctx.fillRect(0, 0, 800, 400);
         ctx.fillStyle = CONFIG.colors.path; ctx.fillRect(0, 0, 800, 50);
 
+        // Dibujar contenedores de reciclaje
+        if (ctx.roundRect) {
+            CONFIG.bins.forEach(b => {
+                ctx.fillStyle = b.color;
+                // Sombra suave
+                ctx.shadowColor = 'rgba(0,0,0,0.5)';
+                ctx.shadowBlur = 5;
+                ctx.shadowOffsetY = 3;
+
+                ctx.beginPath();
+                ctx.roundRect(b.x, b.y, b.w, b.h, 10);
+                ctx.fill();
+
+                // Reset sombra
+                ctx.shadowBlur = 0;
+                ctx.shadowOffsetY = 0;
+
+                // Label e Icono guía
+                ctx.fillStyle = b.textColor;
+                ctx.font = 'bold 16px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(b.label, b.x + b.w / 2, b.y + 25);
+
+                // Dibujar pequeña indicación de lo que entra
+                ctx.font = '24px Arial';
+                ctx.fillText(b.accept.join(" "), b.x + b.w / 2, b.y + 60);
+            });
+        } else {
+            CONFIG.bins.forEach(b => {
+                ctx.fillStyle = b.color;
+                ctx.fillRect(b.x, b.y, b.w, b.h);
+
+                ctx.fillStyle = b.textColor;
+                ctx.font = 'bold 16px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(b.label, b.x + b.w / 2, b.y + 25);
+
+                ctx.font = '24px Arial';
+                ctx.fillText(b.accept.join(" "), b.x + b.w / 2, b.y + 60);
+            });
+        }
+
         // Dibujar items
         state.items.forEach(item => {
-            ctx.font = '30px Arial';
+            ctx.save();
+            ctx.font = '40px Arial';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText(item.icon, item.x, item.y);
-        });
 
-        // Dibujar Robot
-        ctx.font = '55px Arial';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText("🤖", state.player.x, state.player.y);
+            // Efecto de borde difuminado
+            ctx.shadowBlur = 15;
+            if (item.type === 'hazard') {
+                ctx.shadowColor = 'rgba(255, 0, 0, 0.8)'; // Rojo para peligros
+            } else {
+                ctx.shadowColor = 'rgba(0, 255, 0, 0.8)'; // Verde para basura
+            }
+
+            // Cambiar el tamaño si se arrastra
+            if (item === state.draggedItem) {
+                ctx.font = '50px Arial';
+                ctx.shadowBlur = 20;
+            }
+
+            ctx.fillText(item.icon, item.x, item.y);
+            ctx.restore();
+        });
 
         // Feedback visual
         state.floatingTexts.forEach(ft => {
             ctx.fillStyle = ft.color;
             ctx.font = 'bold 24px Rajdhani';
+            ctx.textAlign = 'center';
             ctx.fillText(ft.text, ft.x, ft.y);
         });
 
@@ -211,7 +361,7 @@ const ParkGame = (() => {
         const overlay = document.getElementById('game-overlay');
         overlay.classList.remove('hidden');
         overlay.querySelector('h3').innerText = win ? "¡PARQUE LIMPIO!" : "MISIÓN FALLIDA";
-        overlay.querySelector('p').innerHTML = `Puntuación: ${state.score} | Nivel: ${state.level}<br>${win ? "¡Has salvado el pulmón de la ciudad!" : (state.lives <= 0 ? "Te has quedado sin integridad." : "Tiempo agotado.")}`;
+        overlay.querySelector('p').innerHTML = `Puntuación: ${state.score} | Nivel: ${state.level}<br>${win ? "¡Has reciclado correctamente!" : (state.lives <= 0 ? "Demasiados errores de reciclaje." : "Tiempo agotado.")}`;
     }
 
     return { start, stop };

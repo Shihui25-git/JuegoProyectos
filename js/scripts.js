@@ -45,8 +45,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- FUNCIONES DE ARCADE ---
 
-    // --- FUNCIONES DE ARCADE ---
-
     function showGameMenu() {
         if (gameMenu) gameMenu.classList.remove('hidden');
         if (levelMenu) levelMenu.classList.add('hidden');
