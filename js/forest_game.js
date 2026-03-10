@@ -17,10 +17,10 @@ const ForestGame = (() => {
     // --- ESTADO ---
     let state = {
         active: false, score: 0, time: CONFIG.totalTime, level: 1, lives: 4,
-        fires: [], player: { x: 400, y: 300 },
+        fires: [], player: { x: 400, y: 300, speed: 300 },
         lastFrame: 0, floatingTexts: [],
         trees: [], // Posiciones estáticas de los árboles
-        keys: { w: false, a: false, s: false, d: false }
+        keys: { w: false, a: false, s: false, d: false, ArrowUp: false, ArrowDown: false, ArrowLeft: false, ArrowRight: false }
     };
 
     let canvas, ctx, animationFrameId;
@@ -45,9 +45,9 @@ const ForestGame = (() => {
     function reset() {
         state.score = 0; state.time = CONFIG.totalTime; state.level = 1; state.lives = 4;
         state.fires = []; state.floatingTexts = [];
-        state.player = { x: 400, y: 300 };
-        state.keys = { w: false, a: false, s: false, d: false };
+        state.player = { x: 400, y: 300, speed: 300 };
         state.active = true;
+        state.keys = { w: false, a: false, s: false, d: false, ArrowUp: false, ArrowDown: false, ArrowLeft: false, ArrowRight: false };
 
         window.removeEventListener('keydown', handleKeyDown);
         window.removeEventListener('keyup', handleKeyUp);
@@ -77,22 +77,13 @@ const ForestGame = (() => {
 
     function handleKeyDown(e) {
         if (!state.active) return;
-        const key = e.key.toLowerCase();
-        if (key === 'w' || key === 'arrowup') state.keys.w = true;
-        if (key === 's' || key === 'arrowdown') state.keys.s = true;
-        if (key === 'a' || key === 'arrowleft') state.keys.a = true;
-        if (key === 'd' || key === 'arrowright') state.keys.d = true;
-
+        if (state.keys.hasOwnProperty(e.key)) state.keys[e.key] = true;
         if (["Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.code)) e.preventDefault();
     }
 
     function handleKeyUp(e) {
         if (!state.active) return;
-        const key = e.key.toLowerCase();
-        if (key === 'w' || key === 'arrowup') state.keys.w = false;
-        if (key === 's' || key === 'arrowdown') state.keys.s = false;
-        if (key === 'a' || key === 'arrowleft') state.keys.a = false;
-        if (key === 'd' || key === 'arrowright') state.keys.d = false;
+        if (state.keys.hasOwnProperty(e.key)) state.keys[e.key] = false;
     }
 
     function loop(timestamp) {
@@ -117,6 +108,16 @@ const ForestGame = (() => {
         state.player.y = Math.max(50, Math.min(370, state.player.y));
         state.time -= dt;
         if (state.time <= 0) { state.time = 0; endGame(state.score >= CONFIG.winScore); return; }
+
+        // Player movement
+        if (state.keys.w || state.keys.ArrowUp) state.player.y -= state.player.speed * dt;
+        if (state.keys.s || state.keys.ArrowDown) state.player.y += state.player.speed * dt;
+        if (state.keys.a || state.keys.ArrowLeft) state.player.x -= state.player.speed * dt;
+        if (state.keys.d || state.keys.ArrowRight) state.player.x += state.player.speed * dt;
+
+        // Limites
+        state.player.x = Math.max(30, Math.min(770, state.player.x));
+        state.player.y = Math.max(50, Math.min(370, state.player.y));
 
         // Progresión de niveles
         if (state.score >= 10) state.level = 3;
@@ -170,15 +171,14 @@ const ForestGame = (() => {
             if (dist < 45) {
                 state.score++;
                 showFloatingText("+1 APAGADO", fire.x, fire.y, '#4CAF50');
-                state.fires.splice(i, 1);
+                state.fires.splice(index, 1);
 
                 if (state.score >= CONFIG.winScore) {
                     endGame(true);
-                    return;
+                } else if (state.fires.length === 0) {
+                    // Si matas el último fuego, spawnea uno nuevo pronto para no dejar al jugador aburrido
+                    spawnFire();
                 }
-
-                // Si matas el último fuego, spawnea uno nuevo pronto para no dejar al jugador aburrido
-                if (state.fires.length === 0) spawnFire();
             }
         }
     }

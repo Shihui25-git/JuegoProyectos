@@ -181,7 +181,7 @@ const ParkGame = (() => {
         state.time -= dt;
         if (state.time <= 0) { state.time = 0; endGame(state.score >= CONFIG.winScore); return; }
 
-        // Progresión de niveles
+        // Progresión de niveles (5 puntos por nivel)
         if (state.score >= 10 && state.level < 3) state.level = 3;
         else if (state.score >= 5 && state.level < 2) state.level = 2;
 

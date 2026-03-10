@@ -18,36 +18,25 @@ const EcoSortGame = (() => {
 
     const LEVEL_CONFIG = {
         1: {
-            targetScore: 100, time: 60, fallSpeed: 3, itemFrequency: 40, hazardFrequency: 120,
+            targetScore: 15, time: 60, fallSpeed: 2.5, itemFrequency: 50, hazardFrequency: 150,
             theme: {
                 name: "COSTA", skyTop: '#01579B', skyBottom: '#0A97D9', ground: '#003060', player: '#90CAF9',
                 goodIcons: ["🥤", "🧴", "📦", "🗑️", "🛢️"], goodIconColor: '#00ff41', badIcons: ["🐟", "🐬", "🐙", "🐢"]
-            }
-        },
-        2: {
-            targetScore: 250, time: 90, fallSpeed: 4, itemFrequency: 35, hazardFrequency: 100,
-            theme: {
-                name: "MAR ABIERTO", skyTop: '#003060', skyBottom: '#01579B', ground: '#001a33', player: '#42A5F5',
-                goodIcons: ["🥤", "🧴", "📦", "🗑️", "🛢️"], goodIconColor: '#00ff41', badIcons: ["🐬", "🐙", "🐢", "🦈"]
-            }
-        },
-        3: {
-            targetScore: 500, time: 120, fallSpeed: 5, itemFrequency: 30, hazardFrequency: 80,
-            theme: {
-                name: "PROFUNDIDADES", skyTop: '#001220', skyBottom: '#003060', ground: '#000814', player: '#1E88E5',
-                goodIcons: ["🥤", "🧴", "📦", "🗑️", "🛢️"], goodIconColor: '#00ff41', badIcons: ["🐙", "🐡", "🐢", "🦑"]
             }
         }
     };
 
     let currentLevel = 1;
     let currentLevelConfig = LEVEL_CONFIG[1];
-    let gameState = { running: false, score: 0, lives: 4, playerX: 360, playerTargetX: 360, items: [], timeRemaining: INITIAL_TIME, frameCount: 0 };
+    let gameState = { running: false, score: 0, lives: 4, playerX: 360, items: [], timeRemaining: INITIAL_TIME, frameCount: 0 };
+    let keys = { ArrowLeft: false, ArrowRight: false, a: false, d: false };
 
     class Player {
-        constructor() { this.width = PLAYER_WIDTH; this.height = PLAYER_HEIGHT; this.y = 330; }
+        constructor() { this.width = PLAYER_WIDTH; this.height = PLAYER_HEIGHT; this.y = 330; this.speed = 14; }
         update() {
-            gameState.playerX += (gameState.playerTargetX - gameState.playerX) * 0.2;
+            if (keys.ArrowLeft || keys.a) gameState.playerX -= this.speed;
+            if (keys.ArrowRight || keys.d) gameState.playerX += this.speed;
+
             if (gameState.playerX < 0) gameState.playerX = 0;
             if (gameState.playerX > 800 - this.width) gameState.playerX = 800 - this.width;
         }
@@ -74,8 +63,17 @@ const EcoSortGame = (() => {
         update() { this.y += currentLevelConfig.fallSpeed; this.rotation += this.rotationSpeed; }
         draw() {
             ctx.save(); ctx.translate(this.x + this.width / 2, this.y + this.height / 2); ctx.rotate(this.rotation);
-            ctx.fillStyle = (!this.isHazard && currentLevelConfig.theme.goodIconColor) ? currentLevelConfig.theme.goodIconColor : (this.isHazard ? '#ff4d4d' : '#00ffff');
-            ctx.font = "30px Arial"; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(this.icon, 0, 0); ctx.restore();
+            ctx.shadowBlur = 15;
+            if (this.isHazard) {
+                ctx.shadowColor = 'rgba(255, 0, 0, 0.8)';
+                ctx.fillStyle = '#ff4d4d';
+            } else {
+                ctx.shadowColor = 'rgba(0, 255, 0, 0.8)';
+                ctx.fillStyle = currentLevelConfig.theme.goodIconColor;
+            }
+            ctx.font = "30px Arial"; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(this.icon, 0, 0);
+            ctx.shadowBlur = 0; // reset
+            ctx.restore();
         }
     }
 
@@ -90,9 +88,18 @@ const EcoSortGame = (() => {
         if (scoreGoal) scoreGoal.innerText = ` / ${currentLevelConfig.targetScore} ptos`;
     }
 
+    function initMenu() {
+        if (!initCanvas()) return;
+        gameState.running = false;
+
+        ctx.clearRect(0, 0, 800, 400);
+        drawBackground();
+        player.draw(); // Draw player on the start screen
+    }
+
     function startGame() {
         if (!initCanvas()) return;
-        gameState = { running: true, score: 0, lives: 4, playerX: 360, playerTargetX: 360, items: [], timeRemaining: currentLevelConfig.time, frameCount: 0 };
+        gameState = { running: true, score: 0, lives: 4, playerX: 360, items: [], timeRemaining: currentLevelConfig.time, frameCount: 0 };
         document.getElementById('game-overlay').classList.add('hidden');
         loop();
     }
@@ -101,9 +108,26 @@ const EcoSortGame = (() => {
         if (!gameState.running) return;
         gameState.frameCount++;
         ctx.clearRect(0, 0, 800, 400);
+
+        // Adjust difficulty dynamically based on score
+        if (gameState.score >= 10) {
+            currentLevelConfig.fallSpeed = 5.5;  // Fast
+            currentLevelConfig.itemFrequency = 30;
+            currentLevelConfig.hazardFrequency = 80;
+        } else if (gameState.score >= 5) {
+            currentLevelConfig.fallSpeed = 4.0;  // Medium
+            currentLevelConfig.itemFrequency = 40;
+            currentLevelConfig.hazardFrequency = 100;
+        } else {
+            currentLevelConfig.fallSpeed = 2.5;  // Slow
+            currentLevelConfig.itemFrequency = 50;
+            currentLevelConfig.hazardFrequency = 150;
+        }
+
         drawBackground();
         player.update();
         player.draw();
+
         if (gameState.frameCount % currentLevelConfig.itemFrequency === 0) gameState.items.push(new FallingItem(false));
         if (gameState.frameCount % currentLevelConfig.hazardFrequency === 0) gameState.items.push(new FallingItem(true));
         for (let item of gameState.items) { item.update(); item.draw(); }
@@ -117,8 +141,15 @@ const EcoSortGame = (() => {
             let item = gameState.items[i];
             const collision = (item.x < gameState.playerX + PLAYER_WIDTH && item.x + ITEM_SIZE > gameState.playerX && item.y < player.y + PLAYER_HEIGHT && item.y + ITEM_SIZE > player.y);
             if (collision) {
-                if (item.isHazard) { gameState.lives--; flashScreen('rgba(255, 0, 0, 0.3)'); }
-                else { gameState.score += 10; gameState.timeRemaining += 2; flashScreen('rgba(0, 255, 0, 0.2)'); }
+                if (item.isHazard) {
+                    gameState.lives--;
+                    gameState.score = Math.max(0, gameState.score - 1);
+                    flashScreen('rgba(255, 0, 0, 0.3)');
+                } else {
+                    gameState.score += 1;
+                    gameState.timeRemaining += 2;
+                    flashScreen('rgba(0, 255, 0, 0.2)');
+                }
                 gameState.items.splice(i, 1); i--;
             } else if (item.y > 400) { gameState.items.splice(i, 1); i--; }
         }
@@ -147,22 +178,11 @@ const EcoSortGame = (() => {
         const title = overlay.querySelector('h3');
         const msg = overlay.querySelector('p');
         if (win) {
-            title.innerText = "¡OBJETIVO " + currentLevel + " COMPLETADO!"; title.style.color = "#00ff41";
-            msg.innerText = "Pulsa ENTER para continuar.";
-            const nextLevel = currentLevel + 1;
-            saveProgress(nextLevel);
-            if (currentLevel < 3) setLevel(nextLevel);
-            else msg.innerText = "¡Felicidades! Has restaurado el equilibrio global.";
-            if (window.updateLevelMenuUI) window.updateLevelMenuUI();
-        } else { title.innerText = "FIN DE MISIÓN"; title.style.color = "#ff0000"; msg.innerText = "Pulsa ENTER para reintentar."; }
-    }
-
-    function saveProgress(level) {
-        const saved = localStorage.getItem('ecoSortProgress');
-        const progress = saved ? JSON.parse(saved) : { maxLevelUnlocked: 1 };
-        if (level > progress.maxLevelUnlocked) {
-            progress.maxLevelUnlocked = level;
-            localStorage.setItem('ecoSortProgress', JSON.stringify(progress));
+            title.innerText = "¡OCÉANO LIMPIO!"; title.style.color = "#00ff41";
+            msg.innerText = "¡Felicidades! Has recogido bastante basura sin destruir el ecosistema.\nPulsa ENTER para reintentar.";
+        } else {
+            title.innerText = "FIN DE MISIÓN"; title.style.color = "#ff0000";
+            msg.innerText = "Demasiados errores de recogida.\nPulsa ENTER para reintentar.";
         }
     }
 
@@ -196,12 +216,21 @@ const EcoSortGame = (() => {
             }
             return;
         }
-        const step = 60;
-        if (e.key.toLowerCase() === 'a' || e.key === 'ArrowLeft') gameState.playerTargetX -= step;
-        if (e.key.toLowerCase() === 'd' || e.key === 'ArrowRight') gameState.playerTargetX += step;
+        if (keys.hasOwnProperty(e.key)) keys[e.key] = true;
+        else if (keys.hasOwnProperty(e.key.toLowerCase())) keys[e.key.toLowerCase()] = true;
     });
 
-    return { start: startGame, setLevel: setLevel, stop: () => { gameState.running = false; } };
+    window.addEventListener('keyup', (e) => {
+        if (keys.hasOwnProperty(e.key)) keys[e.key] = false;
+        else if (keys.hasOwnProperty(e.key.toLowerCase())) keys[e.key.toLowerCase()] = false;
+    });
+
+    return {
+        start: startGame, initMenu: initMenu, setLevel: setLevel, stop: () => {
+            gameState.running = false;
+            keys = { ArrowLeft: false, ArrowRight: false, a: false, d: false }; // reset keys on stop
+        }
+    };
 })();
 
 window.setLevel = EcoSortGame.setLevel;
