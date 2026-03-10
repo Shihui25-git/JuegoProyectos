@@ -129,6 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (window.ForestGame && window.ForestGame.stop) window.ForestGame.stop();
                         if (window.TrafficControlGame && window.TrafficControlGame.stop) window.TrafficControlGame.stop();
                         if (window.RecyclingHeroGame && window.RecyclingHeroGame.stop) window.RecyclingHeroGame.stop();
+                        if (window.EnergyGame && window.EnergyGame.stop) window.EnergyGame.stop();
 
                         window.currentGameMode = 'eco';
                         // Direct Start for ECO-SORT Level 1
@@ -145,6 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (window.ForestGame && window.ForestGame.stop) window.ForestGame.stop();
                         if (window.TrafficControlGame && window.TrafficControlGame.stop) window.TrafficControlGame.stop();
                         if (window.RecyclingHeroGame && window.RecyclingHeroGame.stop) window.RecyclingHeroGame.stop();
+                        if (window.EnergyGame && window.EnergyGame.stop) window.EnergyGame.stop();
 
                         window.currentGameMode = 'park';
                         // Direct Start for Park Cleaner
@@ -161,6 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (window.ParkGame && window.ParkGame.stop) window.ParkGame.stop();
                         if (window.TrafficControlGame && window.TrafficControlGame.stop) window.TrafficControlGame.stop();
                         if (window.RecyclingHeroGame && window.RecyclingHeroGame.stop) window.RecyclingHeroGame.stop();
+                        if (window.EnergyGame && window.EnergyGame.stop) window.EnergyGame.stop();
 
                         window.currentGameMode = 'forest';
                         showGame('forest');
@@ -176,6 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (window.ParkGame && window.ParkGame.stop) window.ParkGame.stop();
                         if (window.ForestGame && window.ForestGame.stop) window.ForestGame.stop();
                         if (window.RecyclingHeroGame && window.RecyclingHeroGame.stop) window.RecyclingHeroGame.stop();
+                        if (window.EnergyGame && window.EnergyGame.stop) window.EnergyGame.stop();
 
                         window.currentGameMode = 'traffic';
                         showGame('traffic');
@@ -191,9 +195,26 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (window.ParkGame && window.ParkGame.stop) window.ParkGame.stop();
                         if (window.ForestGame && window.ForestGame.stop) window.ForestGame.stop();
                         if (window.TrafficControlGame && window.TrafficControlGame.stop) window.TrafficControlGame.stop();
+                        if (window.EnergyGame && window.EnergyGame.stop) window.EnergyGame.stop();
 
                         window.currentGameMode = 'recycling';
                         showGame('recycling');
+                    } else if (gameName === 'energy-game') {
+                        if (gameTitle) gameTitle.textContent = 'Energy Game';
+                        if (levelSuffix) levelSuffix.style.display = 'none';
+                        if (integrityHud) integrityHud.style.display = 'none';
+                        if (controls) controls.innerHTML = 'Click en Tubería: Rotar Pieza';
+                        if (instruction) instruction.textContent = '¡Conecta la red eléctrica (ODS 7)!';
+
+                        // Stop others
+                        if (window.EcoSortGame && window.EcoSortGame.stop) window.EcoSortGame.stop();
+                        if (window.ParkGame && window.ParkGame.stop) window.ParkGame.stop();
+                        if (window.ForestGame && window.ForestGame.stop) window.ForestGame.stop();
+                        if (window.TrafficControlGame && window.TrafficControlGame.stop) window.TrafficControlGame.stop();
+                        if (window.RecyclingHeroGame && window.RecyclingHeroGame.stop) window.RecyclingHeroGame.stop();
+
+                        window.currentGameMode = 'energy';
+                        showGame('energy');
                     }
                 });
             }
@@ -204,33 +225,51 @@ document.addEventListener('DOMContentLoaded', () => {
         if (gameMenu) gameMenu.classList.add('hidden');
         if (gameContainerPanel) gameContainerPanel.classList.remove('hidden');
 
-        if (mode === 'park') {
-            if (window.ParkGame) window.ParkGame.start();
-        } else if (mode === 'forest') {
-            if (window.ForestGame) window.ForestGame.start();
-        } else if (mode === 'traffic') {
-            if (window.TrafficControlGame) window.TrafficControlGame.initMenu();
-        } else if (mode === 'recycling') {
-            if (window.RecyclingHeroGame) window.RecyclingHeroGame.start();
-        } else {
-            // mode is numeric level for Eco-Sort
-            const level = parseInt(mode);
-            selectedLevel = level;
-            if (currentLevelSpan) currentLevelSpan.textContent = level;
-            if (typeof setLevel === 'function') setLevel(level);
+        switch (mode) {
+            case 'park':
+                if (window.ParkGame) window.ParkGame.start();
+                break;
+            case 'forest':
+                if (window.ForestGame) window.ForestGame.start();
+                break;
+            case 'traffic':
+                if (window.TrafficControlGame) window.TrafficControlGame.initMenu();
+                break;
+            case 'recycling':
+                if (window.RecyclingHeroGame) window.RecyclingHeroGame.start();
+                break;
+            case 'energy':
+                const overlay = document.getElementById('game-overlay');
+                if (overlay) {
+                    overlay.classList.remove('hidden');
+                    const title = overlay.querySelector('h3');
+                    const msg = overlay.querySelector('p');
+                    title.innerText = "PULSA ENTER PARA EMPEZAR";
+                    title.style.color = "#fff";
+                    msg.innerText = "¡Haz clic en las tuberías para conectarlas!";
+                }
+                if (window.EnergyGame) window.EnergyGame.start(1);
+                break;
+            default:
+                // mode is numeric level for Eco-Sort
+                const level = parseInt(mode);
+                selectedLevel = level;
+                if (currentLevelSpan) currentLevelSpan.textContent = level;
+                if (typeof setLevel === 'function') setLevel(level);
 
-            // We need to show the start screen overlay
-            const overlay = document.getElementById('game-overlay');
-            if (overlay) {
-                overlay.classList.remove('hidden');
-                const title = overlay.querySelector('h3');
-                const msg = overlay.querySelector('p');
-                title.innerText = "PULSA ENTER PARA EMPEZAR";
-                title.style.color = "#fff";
-                msg.innerText = "¡Recoge la basura (A/D o Flechas) y esquiva los obstáculos marinos!";
-            }
+                // We need to show the start screen overlay
+                const ecoOverlay = document.getElementById('game-overlay');
+                if (ecoOverlay) {
+                    ecoOverlay.classList.remove('hidden');
+                    const title = ecoOverlay.querySelector('h3');
+                    const msg = ecoOverlay.querySelector('p');
+                    title.innerText = "PULSA ENTER PARA EMPEZAR";
+                    title.style.color = "#fff";
+                    msg.innerText = "¡Recoge la basura (A/D o Flechas) y esquiva los obstáculos marinos!";
+                }
 
-            if (window.EcoSortGame) window.EcoSortGame.initMenu();
+                if (window.EcoSortGame) window.EcoSortGame.initMenu();
+                break;
         }
     }
 
