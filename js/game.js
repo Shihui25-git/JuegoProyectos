@@ -179,11 +179,15 @@ const EcoSortGame = (() => {
         const msg = overlay.querySelector('p');
         if (win) {
             title.innerText = "¡OCÉANO LIMPIO!"; title.style.color = "#00ff41";
-            msg.innerText = "¡Felicidades! Has recogido bastante basura sin destruir el ecosistema.\nPulsa ENTER para reintentar.";
+            msg.innerText = "¡Felicidades! Se acabó la partida.\nVolviendo al Arcade...";
         } else {
             title.innerText = "FIN DE MISIÓN"; title.style.color = "#ff0000";
-            msg.innerText = "Demasiados errores de recogida.\nPulsa ENTER para reintentar.";
+            msg.innerText = "Demasiados errores de recogida.\nVolviendo al Arcade...";
         }
+
+        setTimeout(() => {
+            if (window.showGameMenu) window.showGameMenu();
+        }, 3000);
     }
 
     function drawBackground() {

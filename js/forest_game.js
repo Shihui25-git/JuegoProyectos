@@ -243,10 +243,14 @@ const ForestGame = (() => {
         overlay.querySelector('h3').innerText = win ? "¡BOSQUE SALVADO!" : "EL BOSQUE SE HA QUEMADO";
 
         let msg = win ?
-            "Proteger los bosques es proteger la vida. Los incendios forestales afectan la biodiversidad y el clima." :
-            "Los ecosistemas necesitan nuestra ayuda. La prevención es clave para evitar incendios forestales.";
+            "Misión Completada.\n\nVolviendo al Arcade..." :
+            "La prevención es clave para evitar incendios forestales.\n\nVolviendo al Arcade...";
 
         overlay.querySelector('p').innerHTML = `Puntuación: ${state.score}<br><br><span style="font-size: 14px; color: var(--accent-color);">${msg}</span>`;
+
+        setTimeout(() => {
+            if (window.showGameMenu) window.showGameMenu();
+        }, 3000);
     }
 
     return { start, stop };
