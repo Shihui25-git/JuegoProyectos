@@ -215,6 +215,42 @@ document.addEventListener('DOMContentLoaded', () => {
 
                         window.currentGameMode = 'energy';
                         showGame('energy');
+                    } else if (gameName === 'escribelo') {
+                        if (gameTitle) gameTitle.textContent = 'Escríbelo';
+                        if (levelSuffix) levelSuffix.style.display = 'none';
+                        if (integrityHud) integrityHud.style.display = 'block';
+                        if (controls) controls.innerHTML = 'Teclado: Escribir palabra';
+                        if (instruction) instruction.textContent = '¡Escribe la palabra correctamente!';
+
+                        // Stop others
+                        if (window.EcoSortGame && window.EcoSortGame.stop) window.EcoSortGame.stop();
+                        if (window.ParkGame && window.ParkGame.stop) window.ParkGame.stop();
+                        if (window.ForestGame && window.ForestGame.stop) window.ForestGame.stop();
+                        if (window.TrafficControlGame && window.TrafficControlGame.stop) window.TrafficControlGame.stop();
+                        if (window.RecyclingHeroGame && window.RecyclingHeroGame.stop) window.RecyclingHeroGame.stop();
+                        if (window.EnergyGame && window.EnergyGame.stop) window.EnergyGame.stop();
+                        if (window.CalculoGame && window.CalculoGame.stop) window.CalculoGame.stop();
+
+                        window.currentGameMode = 'escribelo';
+                        showGame('escribelo');
+                    } else if (gameName === 'calculo') {
+                        if (gameTitle) gameTitle.textContent = 'Cálculo';
+                        if (levelSuffix) levelSuffix.style.display = 'none';
+                        if (integrityHud) integrityHud.style.display = 'block';
+                        if (controls) controls.innerHTML = 'Teclado: Escribir número | Enter: Confirmar';
+                        if (instruction) instruction.textContent = '¡Resuelve la operación correctamente!';
+
+                        // Stop others
+                        if (window.EcoSortGame && window.EcoSortGame.stop) window.EcoSortGame.stop();
+                        if (window.ParkGame && window.ParkGame.stop) window.ParkGame.stop();
+                        if (window.ForestGame && window.ForestGame.stop) window.ForestGame.stop();
+                        if (window.TrafficControlGame && window.TrafficControlGame.stop) window.TrafficControlGame.stop();
+                        if (window.RecyclingHeroGame && window.RecyclingHeroGame.stop) window.RecyclingHeroGame.stop();
+                        if (window.EnergyGame && window.EnergyGame.stop) window.EnergyGame.stop();
+                        if (window.EscribeloGame && window.EscribeloGame.stop) window.EscribeloGame.stop();
+
+                        window.currentGameMode = 'calculo';
+                        showGame('calculo');
                     }
                 });
             }
@@ -249,6 +285,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     msg.innerText = "¡Haz clic en las tuberías para conectarlas!";
                 }
                 if (window.EnergyGame) window.EnergyGame.start(1);
+                break;
+            case 'escribelo':
+                if (window.EscribeloGame) window.EscribeloGame.start();
+                break;
+            case 'calculo':
+                const calcOverlay = document.getElementById('game-overlay');
+                if (calcOverlay) {
+                    calcOverlay.classList.remove('hidden');
+                    const title = calcOverlay.querySelector('h3');
+                    const msg = calcOverlay.querySelector('p');
+                    title.innerText = "PULSA ENTER PARA EMPEZAR";
+                    title.style.color = "#fff";
+                    msg.innerText = "Cálculo mental rápido. Usa los números y pulsa Enter.";
+                }
+                if (window.CalculoGame) window.CalculoGame.start();
                 break;
             default:
                 // mode is numeric level for Eco-Sort
