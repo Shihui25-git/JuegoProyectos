@@ -1,375 +1,319 @@
-// ==========================================
-// CALCULADORA - INTEGRADA EN EL CANVAS (ODS)
-// ==========================================
-
-window.CalculoGame = (function () {
+/**
+ * CÁLCULO RÁPIDO - Arcade Game Logic
+ * Resuelve las operaciones matemáticas antes de que caigan.
+ * Estética: Pizarra verde clásica.
+ */
+const CalculoGame = (() => {
     let canvas, ctx;
+    let running = false;
     let score = 0;
     let lives = 4;
-    let correctAnswer = null;
-    let currentPhase = 1;
-    let timeRemaining = 60;
-    let timerInterval = null;
-    let animationFrameId = null;
+    let gameState = 'waiting'; // 'waiting', 'playing', 'ended'
+    let lastTime = 0;
+    
+    let operations = [];
+    let spawnTimer = 0;
+    let spawnInterval = 3000;
+    let fallSpeed = 30; // pixels per second
+    
+    let typedAnswer = "";
+    
+    // Chalk colors
+    const BOARD_COLOR = '#2b5329'; // dark green board
+    const BORDER_COLOR = '#6b4d24'; // wood
+    const CHALK_WHITE = '#f2f2f2';
+    const CHALK_YELLOW = '#f7ea8b';
+    const CHALK_RED = '#f07d7d';
 
-    let isPlaying = false;
-    let problemString = "";
-    let feedbackMsg = "";
-    let feedbackTimer = 0;
-    let isFeedbackCorrect = false;
-    let userInput = ""; // Para capturar lo que teclea el usuario
-    let gameOver = false;
-    let isWin = false;
-
-    // Elementos del HUD externo
-    let externalScoreDisplay, externalTimeDisplay, externalLivesDisplay;
-
-    function init() {
-        canvas = document.getElementById('gameCanvas');
-        if (!canvas) return;
-        ctx = canvas.getContext('2d');
-
-        // Referencias al HUD del portal
-        externalScoreDisplay = document.getElementById('score');
-        externalTimeDisplay = document.getElementById('time');
-        externalLivesDisplay = document.getElementById('lives');
-
-        // Event listener para teclado
-        window.addEventListener('keydown', handleKeyDown);
-    }
-
-    function handleKeyDown(e) {
-        if (!isPlaying || gameOver) return;
-
-        // Si es un número (teclas de arriba o numpad)
-        if (!isNaN(e.key) && e.key !== ' ') {
-            userInput += e.key;
+    function initCanvas() {
+        if (!canvas) {
+            canvas = document.getElementById('gameCanvas');
+            if (canvas) ctx = canvas.getContext('2d');
         }
-        // Si es retroceso para borrar
-        else if (e.key === 'Backspace') {
-            userInput = userInput.slice(0, -1);
+        return !!ctx;
+    }
+
+    function initGame() {
+        if (!initCanvas()) return;
+        score = 0;
+        lives = 4;
+        gameState = 'waiting';
+        operations = [];
+        spawnTimer = 0;
+        spawnInterval = 3000;
+        fallSpeed = 30;
+        typedAnswer = "";
+        
+        // Fix potential button focus trapping keyboard events
+        if (document.activeElement) document.activeElement.blur();
+        window.focus();
+        
+        const overlay = document.getElementById('game-overlay');
+        overlay.classList.remove('hidden');
+        overlay.querySelector('h3').innerText = "PULSA ENTER PARA EMPEZAR";
+        overlay.querySelector('h3').style.color = "#fff";
+        overlay.querySelector('p').innerText = "Cálculo Rápido: Resuelve las operaciones y pulsa Enter.";
+
+        ctx.clearRect(0, 0, 800, 400);
+        drawBoard();
+        updateHUD();
+    }
+
+    function startGame() {
+        if (!initCanvas()) return;
+        running = true;
+        score = 0;
+        lives = 4;
+        gameState = 'playing';
+        operations = [];
+        spawnTimer = 0;
+        spawnInterval = 3000;
+        fallSpeed = 30;
+        typedAnswer = "";
+        
+        document.getElementById('game-overlay').classList.add('hidden');
+        lastTime = performance.now();
+        generateOperation();
+        requestAnimationFrame(loop);
+    }
+
+    function generateOperation() {
+        const types = ['+', '-', '*'];
+        const opType = types[Math.floor(Math.random() * types.length)];
+        let num1, num2, result;
+        
+        // Difficulty scaling based on score
+        let difficulty = 1;
+        if (score >= 20) difficulty = 3;
+        else if (score >= 10) difficulty = 2;
+        
+        switch (opType) {
+            case '+':
+                num1 = Math.floor(Math.random() * (10 * difficulty)) + 1;
+                num2 = Math.floor(Math.random() * (10 * difficulty)) + 1;
+                result = num1 + num2;
+                break;
+            case '-':
+                // Ensure positive result for subtraction
+                num1 = Math.floor(Math.random() * (10 * difficulty)) + 5;
+                num2 = Math.floor(Math.random() * num1) + 1;
+                result = num1 - num2;
+                break;
+            case '*':
+                const maxMult = (difficulty > 3) ? 10 : (difficulty > 1 ? 7 : 5);
+                num1 = Math.floor(Math.random() * maxMult) + 2;
+                num2 = Math.floor(Math.random() * maxMult) + 2;
+                result = num1 * num2;
+                break;
         }
-        // Si pulsa Enter y ha escrito algo, validar
-        else if (e.key === 'Enter' && userInput.length > 0) {
-            checkAnswer();
-        }
+        
+        operations.push({
+            text: `${num1} ${opType} ${num2}`,
+            answer: result.toString(),
+            x: Math.floor(Math.random() * (canvas.width - 200)) + 100,
+            y: 40 // Start near top
+        });
     }
 
-    // ==========================================
-    // UTILIDADES MATEMÁTICAS
-    // ==========================================
-    function getRandomInt(min, max) {
-        return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
+    function loop(timestamp) {
+        if (!running) return;
+        const deltaTime = timestamp - lastTime;
+        lastTime = timestamp;
 
-    // ==========================================
-    // CONTROL DEL TIEMPO
-    // ==========================================
-    function startTimer() {
-        clearInterval(timerInterval);
-        timeRemaining = 60;
-        updateExternalHUD();
-
-        timerInterval = setInterval(() => {
-            timeRemaining--;
-            updateExternalHUD();
-
-            if (timeRemaining <= 0) {
-                clearInterval(timerInterval);
-                triggerGameOver(false);
-            }
-        }, 1000);
-    }
-
-    function stopTimer() {
-        clearInterval(timerInterval);
-    }
-
-    // ==========================================
-    // GENERACIÓN DE PROBLEMAS
-    // ==========================================
-    function generateProblem() {
-        checkPhase();
-
-        result = 0;
-        let operations;
-
-        if (currentPhase === 3) {
-            operations = ['+', '-', '*'];
-        } else {
-            operations = ['+', '-', '*', '/'];
-        }
-
-        let isTripleSum = (Math.random() < 0.2) && operations.includes('+');
-
-        if (isTripleSum) {
-            let minLimit, maxLimit;
-            if (currentPhase === 1) { minLimit = 1; maxLimit = 10; }
-            else if (currentPhase === 2) { minLimit = 10; maxLimit = 30; }
-            else { minLimit = 20; maxLimit = 50; }
-
-            let a = getRandomInt(minLimit, maxLimit);
-            let b = getRandomInt(minLimit, maxLimit);
-            let c = getRandomInt(minLimit, maxLimit);
-
-            problemString = `${a} + ${b} + ${c} =`;
-            result = a + b + c;
-        } else {
-            let op = operations[getRandomInt(0, operations.length - 1)];
-            let a, b;
-
-            switch (op) {
-                case '+':
-                    if (currentPhase === 1) { a = getRandomInt(1, 15); b = getRandomInt(1, 15); }
-                    else if (currentPhase === 2) { a = getRandomInt(10, 50); b = getRandomInt(10, 50); }
-                    else { a = getRandomInt(50, 100); b = getRandomInt(50, 100); }
-
-                    problemString = `${a} + ${b} =`;
-                    result = a + b;
-                    break;
-                case '-':
-                    if (currentPhase === 1) { a = getRandomInt(1, 15); b = getRandomInt(1, 15); }
-                    else if (currentPhase === 2) { a = getRandomInt(10, 50); b = getRandomInt(10, 50); }
-                    else { a = getRandomInt(50, 100); b = getRandomInt(50, 100); }
-
-                    if (a < b) { let temp = a; a = b; b = temp; }
-
-                    problemString = `${a} - ${b} =`;
-                    result = a - b;
-                    break;
-                case '*':
-                    if (currentPhase === 1) { a = getRandomInt(1, 5); b = getRandomInt(1, 5); }
-                    else if (currentPhase === 2) { a = getRandomInt(1, 10); b = getRandomInt(1, 10); }
-                    else { a = getRandomInt(10, 20); b = getRandomInt(2, 5); }
-
-                    problemString = `${a} × ${b} =`;
-                    result = a * b;
-                    break;
-                case '/':
-                    if (currentPhase === 1) {
-                        b = getRandomInt(1, 5);
-                        result = getRandomInt(1, 5);
-                        a = b * result;
-                    } else if (currentPhase === 2) {
-                        b = getRandomInt(2, 10);
-                        result = getRandomInt(2, 10);
-                        a = b * result;
-                    }
-                    problemString = `${a} ÷ ${b} =`;
-                    break;
-            }
+        if (gameState === 'playing') {
+            update(deltaTime);
         }
 
-        correctAnswer = result;
-        userInput = ""; // Reiniciar input del usuario
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawBoard();
+        drawGameElements();
+
+        updateHUD();
+        requestAnimationFrame(loop);
     }
 
-    // ==========================================
-    // LÓGICA DE FASES Y ESTADO
-    // ==========================================
-    function checkPhase() {
+    function update(dt) {
+        // Adjust speed and spawn based on score
+        let targetSpeed = 30;
+        let targetSpawn = 3000;
         if (score >= 20) {
-            currentPhase = 3;
-        } else if (score >= 10 && score < 20) {
-            currentPhase = 2;
-        } else {
-            currentPhase = 1;
+            targetSpeed = 45;
+            targetSpawn = 2000;
+        } else if (score >= 10) {
+            targetSpeed = 38;
+            targetSpawn = 2500;
+        }
+        
+        fallSpeed = targetSpeed;
+        spawnInterval = targetSpawn;
+
+        // Spawn logic
+        spawnTimer += dt;
+        if (spawnTimer >= spawnInterval) {
+            spawnTimer = 0;
+            generateOperation();
+        }
+
+        // Move operations down
+        const moveDist = fallSpeed * (dt / 1000);
+        for (let i = operations.length - 1; i >= 0; i--) {
+            operations[i].y += moveDist;
+            // Check if it hit bottom
+            if (operations[i].y > canvas.height - 40) { // Don't let it hit user input line
+                operations.splice(i, 1);
+                lives -= 1;
+                typedAnswer = ""; // clear typed answer in panic
+                if (lives <= 0) {
+                    endGame("¡TE QUEDASTE SIN VIDAS!");
+                }
+            }
         }
     }
 
-    function showFeedback(isCorrect, message) {
-        isFeedbackCorrect = isCorrect;
-        feedbackMsg = message;
-        feedbackTimer = 60; // Mostrar durante 60 frames (aprox 1s)
+    function drawBoard() {
+        // Wooden border
+        ctx.fillStyle = BORDER_COLOR;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Chalkboard inside
+        ctx.fillStyle = BOARD_COLOR;
+        const borderThickness = 12;
+        ctx.fillRect(borderThickness, borderThickness, canvas.width - borderThickness * 2, canvas.height - borderThickness * 2);
+
+        // Eraser dust / smudges (subtle effect)
+        ctx.fillStyle = 'rgba(255,255,255,0.03)';
+        ctx.beginPath();
+        ctx.arc(200, 150, 100, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(600, 250, 150, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    function drawGameElements() {
+        if (gameState !== 'playing') return;
+
+        // Draw operations falling
+        ctx.font = 'bold 36px "Comic Sans MS", cursive, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        
+        for (let op of operations) {
+            ctx.fillStyle = CHALK_WHITE;
+            ctx.fillText(op.text, op.x, op.y);
+            // Draw chalk shadow for realism
+            ctx.fillStyle = 'rgba(255,255,255,0.2)';
+            ctx.fillText(op.text, op.x + 2, op.y + 2);
+        }
+
+        // Draw Typed Answer line
+        ctx.fillStyle = 'rgba(255,255,255,0.1)';
+        ctx.fillRect(20, canvas.height - 40, canvas.width - 40, 2);
+
+        ctx.font = 'bold 32px "Comic Sans MS", cursive, sans-serif';
+        ctx.fillStyle = CHALK_YELLOW;
+        ctx.textAlign = 'center';
+        let displayText = "Respuesta: " + typedAnswer;
+        if (Math.floor(performance.now() / 500) % 2 === 0) {
+            displayText += "_";
+        }
+        ctx.fillText(displayText, canvas.width / 2, canvas.height - 20);
     }
 
     function checkAnswer() {
-        if (!isPlaying || gameOver) return;
+        if (gameState !== 'playing' || typedAnswer === "") return;
 
-        let answer = parseInt(userInput, 10);
+        // Check if any operation matches this answer
+        // We prioritize the lowest one on screen
+        let hitIndex = -1;
+        let maxY = -1;
+        for (let i = 0; i < operations.length; i++) {
+            if (operations[i].answer === typedAnswer) {
+                if (operations[i].y > maxY) {
+                    maxY = operations[i].y;
+                    hitIndex = i;
+                }
+            }
+        }
 
-        if (answer === correctAnswer) {
+        if (hitIndex !== -1) {
+            // Correct answer
+            operations.splice(hitIndex, 1);
             score += 2;
-            showFeedback(true, '¡Correcto! +2 pts');
-
-            if (score >= 30) {
-                triggerGameOver(true);
-            } else {
-                generateProblem();
-            }
         } else {
-            lives--;
-            showFeedback(false, `Mal. Era ${correctAnswer}`);
-            userInput = ""; // Limpiar para que intente de nuevo
-
-            if (lives <= 0) {
-                triggerGameOver(false);
-            } else {
-                generateProblem(); // Opcional: Generar uno nuevo si falla
-            }
+            // Incorrect, optionally deduct a small penalty or just do nothing
+            // In this version, we just do nothing and waiting for correct
         }
-        updateExternalHUD();
+        typedAnswer = ""; // Always clear after Enter
     }
 
-    function triggerGameOver(win) {
-        isPlaying = false;
-        gameOver = true;
-        isWin = win;
-        stopTimer();
-    }
+    function handleInput(key) {
+        if (gameState !== 'playing') return;
 
-    function updateExternalHUD() {
-        if (externalScoreDisplay) externalScoreDisplay.innerText = score;
-
-        // Formato de tiempo M:SS
-        if (externalTimeDisplay) {
-            let m = Math.floor(Math.max(0, timeRemaining) / 60);
-            let s = Math.max(0, timeRemaining) % 60;
-            externalTimeDisplay.innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
-        }
-
-        if (externalLivesDisplay) externalLivesDisplay.innerText = lives;
-    }
-
-    // ==========================================
-    // RENDERIZADO CANVAS (PIZARRA)
-    // ==========================================
-    function draw() {
-        if (!ctx) return;
-
-        // Limpiar
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        // Dibujar Pizarra Verde
-        ctx.fillStyle = '#1e3f20'; // Verde pizarra oscuro
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        // Borde de madera
-        ctx.strokeStyle = '#8b5a2b';
-        ctx.lineWidth = 15;
-        ctx.strokeRect(7.5, 7.5, canvas.width - 15, canvas.height - 15);
-
-        // Dibujar Textos Globales (Estilo tiza)
-        ctx.fillStyle = '#fff';
-        ctx.shadowColor = 'rgba(255,255,255,0.5)';
-        ctx.shadowBlur = 4;
-
-        // Puntuación Arriba Izquierda
-        ctx.font = '24px "Press Start 2P", monospace';
-        ctx.textAlign = 'left';
-        ctx.fillText(`PTS: ${score}`, 30, 50);
-
-        // Vidas Arriba Derecha
-        ctx.textAlign = 'right';
-        ctx.fillText(`VIDAS: ${lives}`, canvas.width - 30, 50);
-
-        // Etapa/Fase
-        ctx.textAlign = 'center';
-        ctx.font = '16px "Press Start 2P", monospace';
-        ctx.fillText(`FASE ${currentPhase}`, canvas.width / 2, 40);
-
-        ctx.shadowBlur = 0; // Quitar sombra para el resto
-
-        if (gameOver) {
-            ctx.fillStyle = 'rgba(0,0,0,0.7)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            ctx.fillStyle = isWin ? '#7aff7a' : '#ff4c4c';
-            ctx.font = '40px "Press Start 2P"';
-            ctx.textAlign = 'center';
-            ctx.fillText(isWin ? "¡ENHORABUENA!" : "¡FIN DE LA CLASE!", canvas.width / 2, canvas.height / 2 - 20);
-
-            ctx.fillStyle = '#fff';
-            ctx.font = '20px "Press Start 2P"';
-            ctx.fillText(`Puntuación Final: ${score}`, canvas.width / 2, canvas.height / 2 + 30);
-            ctx.fillText("Pulsa ENTER para reiniciar", canvas.width / 2, canvas.height / 2 + 70);
-
+        if (key === 'Enter') {
+            checkAnswer();
             return;
         }
 
-        if (!isPlaying) return;
-
-        // Dibujar Problema Central
-        ctx.fillStyle = '#fff';
-        ctx.font = '50px "Press Start 2P", monospace';
-        ctx.textAlign = 'center';
-        ctx.fillText(problemString, canvas.width / 2, canvas.height / 2 - 20);
-
-        // Dibujar Input del Usuario
-        ctx.fillStyle = '#ffdb58'; // Tiza amarilla
-        ctx.font = '60px "Press Start 2P", monospace';
-
-        // Barra de cursor intermitente
-        let cursor = (Math.floor(Date.now() / 500) % 2 === 0) ? "_" : " ";
-        ctx.fillText(userInput + cursor, canvas.width / 2, canvas.height / 2 + 60);
-
-        // Dibujar mensaje de feedback si está activo
-        if (feedbackTimer > 0) {
-            ctx.fillStyle = isFeedbackCorrect ? '#7aff7a' : '#ff4c4c';
-            ctx.font = '20px "Press Start 2P"';
-            ctx.fillText(feedbackMsg, canvas.width / 2, canvas.height / 2 + 130);
-            feedbackTimer--;
+        if (key === 'Backspace') {
+            typedAnswer = typedAnswer.slice(0, -1);
+            return;
         }
-    }
 
-    function gameLoop() {
-        draw();
-
-        if (isPlaying || gameOver) {
-            animationFrameId = requestAnimationFrame(gameLoop);
-        }
-    }
-
-    // ==========================================
-    // EXPORTACIÓN API
-    // ==========================================
-    return {
-        start: function () {
-            if (!canvas) init();
-
-            const overlay = document.getElementById('game-overlay');
-            if (overlay) overlay.classList.add('hidden');
-
-            score = 0;
-            lives = 4;
-            currentPhase = 1;
-            gameOver = false;
-            isPlaying = true;
-            feedbackTimer = 0;
-            userInput = "";
-
-            generateProblem();
-            startTimer();
-            updateExternalHUD();
-
-            // Iniciar bucle solo si no hay otro
-            if (animationFrameId) cancelAnimationFrame(animationFrameId);
-            gameLoop();
-        },
-
-        stop: function () {
-            isPlaying = false;
-            stopTimer();
-            if (animationFrameId) {
-                cancelAnimationFrame(animationFrameId);
-                animationFrameId = null;
+        // Only allow numbers and maybe negative sign
+        if (/^[0-9\-]$/.test(key)) {
+            // Prevent too long answers
+            if (typedAnswer.length < 5) {
+                typedAnswer += key;
             }
-            window.removeEventListener('keydown', handleKeyDown);
+        }
+    }
+
+    function updateHUD() {
+        const scoreEl = document.getElementById('score');
+        if (scoreEl) scoreEl.innerText = score;
+
+        const livesEl = document.getElementById('lives');
+        if (livesEl) livesEl.innerText = lives;
+
+        const timeEl = document.getElementById('time');
+        if (timeEl) timeEl.innerText = 'INF';
+    }
+
+    function endGame(reason = "FIN DEL JUEGO") {
+        running = false;
+        gameState = 'ended';
+        const overlay = document.getElementById('game-overlay');
+        overlay.classList.remove('hidden');
+        overlay.querySelector('h3').innerText = reason;
+        overlay.querySelector('h3').style.color = CHALK_RED;
+        overlay.querySelector('p').innerText = "Puntos Finales: " + score + "\nPulsa ENTER para reintentar";
+        updateHUD();
+    }
+
+    // Input listeners global
+    window.addEventListener('keydown', (e) => {
+        if (window.currentGameMode !== 'calculo') return;
+
+        if (gameState !== 'playing') {
+            if (e.key === 'Enter') startGame();
+            return;
+        }
+
+        if (e.key === ' ' || e.key === 'Backspace' || e.key === 'Enter') {
+            e.preventDefault();
+        }
+
+        handleInput(e.key);
+    });
+
+    return {
+        start: initGame,
+        stop: () => {
+            running = false;
+            gameState = 'waiting';
         }
     };
 })();
 
-// Listener global para arrancar con ENTER si estamos en la pantalla de inicio del juego o en GameOver
-document.addEventListener('keydown', function (e) {
-    if (e.key === 'Enter') {
-        const overlay = document.getElementById('game-overlay');
-        const isOverlayVisible = overlay && !overlay.classList.contains('hidden');
-
-        // Si estamos en el modo de cálculo, y (el overlay es visible O estamos en Game Over)
-        if (window.currentGameMode === 'calculo') {
-            if (isOverlayVisible || (window.CalculoGame && window.CalculoGame.gameOver)) {
-                window.CalculoGame.start();
-            }
-        }
-    }
-});
+window.CalculoGame = CalculoGame;
