@@ -584,6 +584,4 @@ footer {
     background: #fff;
 }
 
-.hidden {
-    display: none !important;
-}
+.hidden { display: none !important; }
