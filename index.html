@@ -117,6 +117,79 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- 4. Problemas Proyecto -->
+                        <div class="premium-card">
+                            <h3>04. PROBLEMAS DEL PROYECTO</h3>
+
+                            <h4 style="color: var(--primary-color); margin-top: 1.5rem; margin-bottom: 0.5rem;">Problema
+                                1: Falta de revisión obligatoria en los Pull Requests</h4>
+                            <p style="margin-bottom: 0.5rem;">Al inicio del desarrollo del proyecto se utilizó GitHub
+                                como plataforma de control de versiones y trabajo colaborativo. Sin embargo, no se
+                                configuró desde el principio la opción de protección de ramas que obliga a que los pull
+                                requests sean revisados y aprobados por otro miembro del equipo antes de fusionarse con
+                                la rama principal.</p>
+                            <p style="margin-bottom: 0.5rem;">Debido a esta falta de configuración, cualquier miembro
+                                del equipo podía aceptar su propio pull request o fusionarlo directamente sin que otro
+                                desarrollador revisara previamente el código. Esto eliminaba una capa importante de
+                                control de calidad, ya que no existía una revisión externa que pudiera detectar posibles
+                                errores o problemas en la estructura del proyecto.</p>
+                            <p style="margin-bottom: 1.5rem;">Posteriormente se identificó este problema y se activó la
+                                revisión obligatoria de pull requests, con el objetivo de mejorar el flujo de trabajo y
+                                evitar errores en futuras integraciones de código.</p>
+
+                            <h4 style="color: var(--primary-color); margin-bottom: 0.5rem;">Problema 2: Error en la
+                                estructura de carpetas del proyecto</h4>
+                            <p style="margin-bottom: 0.5rem;">Como consecuencia de no contar inicialmente con una
+                                revisión obligatoria de pull requests, se produjo un error en la estructura de carpetas
+                                del proyecto. Durante una subida de cambios al repositorio, se creó accidentalmente una
+                                carpeta adicional que no formaba parte de la organización prevista del proyecto.</p>
+                            <p style="margin-bottom: 0.5rem;">Dentro de esta carpeta se generaron otras subcarpetas,
+                                provocando una estructura incorrecta y desorganizada del código. Este problema no fue
+                                detectado en el momento de realizar la subida debido a que el pull request no fue
+                                revisado por otro miembro del equipo antes de integrarse en la rama principal.</p>
+                            <p>Para solucionarlo, se revisó manualmente la estructura del proyecto. El contenido de las
+                                carpetas incorrectas fue trasladado a las ubicaciones correspondientes dentro del
+                                proyecto, reorganizando correctamente los archivos. Finalmente, la carpeta adicional fue
+                                eliminada para restaurar la estructura adecuada del repositorio.</p>
+                        </div>
+
+                        <!-- 5. Lecciones Aprendidas -->
+                        <div class="premium-card">
+                            <h3>05. LECCIONES APRENDIDAS</h3>
+                            <p style="margin-bottom: 0.5rem;">Durante el desarrollo del proyecto se comprendió la
+                                importancia de configurar correctamente las herramientas de trabajo colaborativo desde
+                                el inicio. El uso de plataformas como GitHub no solo permite almacenar el código, sino
+                                también establecer mecanismos de control que ayudan a mantener la calidad del proyecto.
+                            </p>
+                            <p style="margin-bottom: 0.5rem;">Uno de los principales aprendizajes fue que la revisión de
+                                código entre miembros del equipo es fundamental para detectar errores antes de que se
+                                integren en la rama principal. La ausencia de este proceso puede provocar problemas en
+                                la organización del proyecto o en el funcionamiento del código.</p>
+                            <p>Además, se reforzó la importancia de mantener una estructura de carpetas clara y revisada
+                                antes de subir cambios al repositorio, ya que pequeños errores al organizar archivos
+                                pueden generar confusión o desorden en el proyecto.</p>
+                        </div>
+
+                        <!-- 6. Medidas Adoptadas -->
+                        <div class="premium-card">
+                            <h3>06. MEDIDAS ADOPTADAS PARA EVITAR LOS MISMOS ERRORES</h3>
+                            <p style="margin-bottom: 1rem;">Para evitar que estos problemas vuelvan a producirse, el
+                                equipo adoptó varias medidas dentro del flujo de trabajo del proyecto.</p>
+                            <ul class="doc-list">
+                                <li style="margin-bottom: 0.5rem;">En primer lugar, se configuró la protección de la
+                                    rama principal en GitHub para que todos los cambios deban realizarse mediante pull
+                                    requests que requieran la revisión y aprobación de al menos otro miembro del equipo
+                                    antes de poder fusionarse.</li>
+                                <li style="margin-bottom: 0.5rem;">Además, se estableció como práctica revisar la
+                                    estructura de carpetas y los archivos incluidos antes de realizar cualquier subida
+                                    al repositorio. De esta forma se reduce la probabilidad de subir archivos o carpetas
+                                    innecesarias.</li>
+                                <li>Por último, se acordó mantener una comunicación más activa entre los miembros del
+                                    equipo durante el proceso de desarrollo, con el objetivo de detectar posibles
+                                    errores lo antes posible y mantener una organización clara del proyecto.</li>
+                            </ul>
+                        </div>
                     </div>
 
                     <div class="mission-status-box">
