@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Handle initial hash on load
     if (window.location.hash) {
         const hash = window.location.hash.substring(1);
-        if (['home', 'definicion', 'gestion', 'arcade'].includes(hash)) {
+        if (['home', 'documentacion', 'memoria', 'arcade'].includes(hash)) {
             showSection(hash);
             if (hash === 'arcade') showGameMenu();
         }
