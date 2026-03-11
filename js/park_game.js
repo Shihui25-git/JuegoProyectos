@@ -24,10 +24,11 @@ const ParkGame = (() => {
 
     // --- ESTADO ---
     let state = {
-        active: false, score: 0, time: CONFIG.totalTime, level: 1, lives: 4,
+        active: false, score: 0, time: 15, level: 1, lives: 4,
         items: [],
         lastFrame: 0, floatingTexts: [],
-        draggedItem: null
+        draggedItem: null,
+        winScore: 5
     };
 
     let canvas, ctx, animationFrameId;
@@ -93,10 +94,10 @@ const ParkGame = (() => {
             if (dist < 30) { // 30px hit radius
                 if (item.type === 'hazard') {
                     // Clickeaste un hazard (gato, perro, árbol)
-                    state.lives--;
+                    if (window.GameMaster) window.GameMaster.loseLife();
+                    else state.lives--;
                     showFloatingText("HP -1", item.x, item.y, '#F44336');
                     state.items.splice(i, 1);
-                    if (state.lives <= 0) endGame(false);
                 } else {
                     // Clickeaste una basura, start dragging
                     state.draggedItem = item;
@@ -137,29 +138,55 @@ const ParkGame = (() => {
                 state.score++;
                 showFloatingText("+1", pos.x, pos.y, '#4CAF50');
             } else {
-                state.lives--;
+                if (window.GameMaster) window.GameMaster.loseLife();
+                else state.lives--;
                 showFloatingText("ERROR -1 HP", pos.x, pos.y, '#F44336');
             }
             // Destruir el item (está al final de state.items, ya que lo movimos en mousedown)
             state.items.pop();
-            if (state.lives <= 0) endGame(false);
-            if (state.score >= CONFIG.winScore) endGame(true);
+            if (state.score >= state.winScore) endGame(true);
         }
 
         state.draggedItem = null;
     }
 
-    function start() {
+    function    start(difficulty = 'EASY', speedMultiplier = 1.0) {
+        this.difficulty = (difficulty || 'EASY').toString().toUpperCase();
+        this.finishTimeMultiplier = speedMultiplier || 1.0;
         if (!init()) return;
         reset();
+        
+        // Adjust based on difficulty
+        const diff = difficulty.toUpperCase();
+        if (diff === 'NORMAL') {
+            state.winScore = 5;
+            state.level = 2;
+        } else if (diff === 'HARD') {
+            state.winScore = 8;
+            state.level = 3;
+        } else {
+            state.winScore = 2;
+            state.level = 1;
+        }
+
+        // Apply speed multiplier to time
+        const baseTime = 15; // 15 seconds base
+        state.time = Math.max(7, baseTime / speedMultiplier);
+
         for (let i = 0; i < 5; i++) spawnItem();
         state.lastFrame = performance.now();
         loop(state.lastFrame);
         document.getElementById('game-overlay').classList.add('hidden');
+        
+        // Clear residual instructions
+        const ctrlP = document.getElementById('game-controls');
+        if (ctrlP) ctrlP.innerText = "RATÓN: Arrastra cada residuo a su cubo";
+        const instP = document.getElementById('game-instruction');
+        if (instP) instP.innerText = "";
 
         // Reset HUD labels
-        document.getElementById('score-label').innerText = "RECICLADO:";
-        document.getElementById('score-goal').innerText = " / " + CONFIG.winScore;
+        document.getElementById('score-label').innerText = "OBJETIVO:";
+        document.getElementById('score-goal').innerText = " / " + state.winScore;
     }
 
     function stop() {
@@ -179,7 +206,7 @@ const ParkGame = (() => {
 
     function update(dt) {
         state.time -= dt;
-        if (state.time <= 0) { state.time = 0; endGame(state.score >= CONFIG.winScore); return; }
+        if (state.time <= 0) { state.time = 0; endGame(state.score >= state.winScore); return; }
 
         // Progresión de niveles (5 puntos por nivel)
         if (state.score >= 10 && state.level < 3) state.level = 3;
@@ -351,7 +378,8 @@ const ParkGame = (() => {
         if (livesEl) livesEl.textContent = state.lives;
 
         if (timeEl) {
-            const m = Math.floor(state.time / 60), s = Math.floor(state.time % 60);
+            const timeRounded = Math.ceil(state.time);
+            const m = Math.floor(timeRounded / 60), s = timeRounded % 60;
             timeEl.textContent = `${m}:${s.toString().padStart(2, '0')}`;
         }
     }
@@ -360,8 +388,13 @@ const ParkGame = (() => {
         state.active = false;
         const overlay = document.getElementById('game-overlay');
         overlay.classList.remove('hidden');
-        overlay.querySelector('h3').innerText = win ? "¡PARQUE LIMPIO!" : "MISIÓN FALLIDA";
-        overlay.querySelector('p').innerHTML = `Puntuación: ${state.score} | Nivel: ${state.level}<br>${win ? "¡Has reciclado correctamente!" : (state.lives <= 0 ? "Demasiados errores de reciclaje." : "Tiempo agotado.")}`;
+        overlay.querySelector('h3').innerText = win ? "¡PARQUE LIMPIO!" : "¡FALLO!";
+        overlay.querySelector('p').innerHTML = win ? "¡Excelente trabajo!" : "Aún queda basura...";
+
+        // Report to GameMaster if available
+        if (window.GameMaster) {
+            window.GameMaster.onGameResult(win);
+        }
     }
 
     return { start, stop };

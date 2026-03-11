@@ -28,8 +28,12 @@ const EcoSortGame = (() => {
 
     let currentLevel = 1;
     let currentLevelConfig = LEVEL_CONFIG[1];
-    let gameState = { running: false, score: 0, lives: 4, playerX: 360, items: [], timeRemaining: INITIAL_TIME, frameCount: 0 };
+    let timeLimit = 15;
+    let targetScore = 5;
+    let fallSpeed = 2.5;
+    let gameState = { running: false, score: 0, lives: 4, playerX: 360, items: [], timeRemaining: 15, frameCount: 0 };
     let keys = { ArrowLeft: false, ArrowRight: false, a: false, d: false };
+    let lastTime = 0;
 
     class Player {
         constructor() { this.width = PLAYER_WIDTH; this.height = PLAYER_HEIGHT; this.y = 330; this.speed = 14; }
@@ -60,7 +64,7 @@ const EcoSortGame = (() => {
             const icons = isHazard ? currentLevelConfig.theme.badIcons : currentLevelConfig.theme.goodIcons;
             this.icon = icons[Math.floor(Math.random() * icons.length)];
         }
-        update() { this.y += currentLevelConfig.fallSpeed; this.rotation += this.rotationSpeed; }
+        update() { this.y += fallSpeed; this.rotation += this.rotationSpeed; }
         draw() {
             ctx.save(); ctx.translate(this.x + this.width / 2, this.y + this.height / 2); ctx.rotate(this.rotation);
             ctx.shadowBlur = 15;
@@ -95,31 +99,70 @@ const EcoSortGame = (() => {
         ctx.clearRect(0, 0, 800, 400);
         drawBackground();
         player.draw(); // Draw player on the start screen
+
+        // Clear residual instructions
+        const ctrlP = document.getElementById('game-controls');
+        if (ctrlP) ctrlP.innerText = "TECLADO: AD o Flechas para moverte";
+        const instP = document.getElementById('game-instruction');
+        if (instP) instP.innerText = "";
     }
 
-    function startGame() {
+    function startGame(difficulty = 'EASY', speedMultiplier = 1.0) {
         if (!initCanvas()) return;
-        gameState = { running: true, score: 0, lives: 4, playerX: 360, items: [], timeRemaining: currentLevelConfig.time, frameCount: 0 };
+        
+        // Adjust settings based on difficulty
+        const diff = difficulty.toUpperCase();
+        if (diff === 'NORMAL') {
+            fallSpeed = 4.5;
+            targetScore = 5;
+        } else if (diff === 'HARD') {
+            fallSpeed = 6.5;
+            targetScore = 8;
+        } else {
+            fallSpeed = 3.0;
+            targetScore = 3;
+        }
+
+        // Apply speed multiplier to time
+        const baseTime = 12; // 12 seconds
+        timeLimit = Math.max(5, baseTime / speedMultiplier);
+
+        gameState = { running: true, score: 0, lives: 4, playerX: 360, items: [], timeRemaining: timeLimit, frameCount: 0 };
         document.getElementById('game-overlay').classList.add('hidden');
-        loop();
+        
+        // Update HUD labels
+        const scoreLabel = document.getElementById('score-label');
+        if (scoreLabel) scoreLabel.innerText = `OBJETIVO:`;
+        const scoreGoal = document.getElementById('score-goal');
+        if (scoreGoal) scoreGoal.innerText = ` / ${targetScore}`;
+
+        lastTime = performance.now();
+        loop(lastTime);
     }
 
-    function loop() {
+    function loop(timestamp) {
         if (!gameState.running) return;
+        
+        const dt = (timestamp - lastTime) / 1000;
+        lastTime = timestamp;
+        
         gameState.frameCount++;
         ctx.clearRect(0, 0, 800, 400);
 
+        // Update timer
+        gameState.timeRemaining -= dt;
+
         // Adjust difficulty dynamically based on score
         if (gameState.score >= 10) {
-            currentLevelConfig.fallSpeed = 5.5;  // Fast
+            fallSpeed = 6.0;  // Fast
             currentLevelConfig.itemFrequency = 30;
             currentLevelConfig.hazardFrequency = 80;
         } else if (gameState.score >= 5) {
-            currentLevelConfig.fallSpeed = 4.0;  // Medium
+            fallSpeed = 4.5;  // Medium
             currentLevelConfig.itemFrequency = 40;
             currentLevelConfig.hazardFrequency = 100;
         } else {
-            currentLevelConfig.fallSpeed = 2.5;  // Slow
+            // Keep current fallSpeed from startGame
             currentLevelConfig.itemFrequency = 50;
             currentLevelConfig.hazardFrequency = 150;
         }
@@ -142,7 +185,8 @@ const EcoSortGame = (() => {
             const collision = (item.x < gameState.playerX + PLAYER_WIDTH && item.x + ITEM_SIZE > gameState.playerX && item.y < player.y + PLAYER_HEIGHT && item.y + ITEM_SIZE > player.y);
             if (collision) {
                 if (item.isHazard) {
-                    gameState.lives--;
+                    if (window.GameMaster) window.GameMaster.loseLife();
+                    else gameState.lives--;
                     gameState.score = Math.max(0, gameState.score - 1);
                     flashScreen('rgba(255, 0, 0, 0.3)');
                 } else {
@@ -151,24 +195,32 @@ const EcoSortGame = (() => {
                     flashScreen('rgba(0, 255, 0, 0.2)');
                 }
                 gameState.items.splice(i, 1); i--;
-            } else if (item.y > 400) { gameState.items.splice(i, 1); i--; }
+            } else if (item.y > 400) { 
+                if (!item.isHazard) {
+                    // Letting a good item fall costs a life
+                    if (window.GameMaster) window.GameMaster.loseLife();
+                    else gameState.lives--;
+                    flashScreen('rgba(255, 0, 0, 0.1)');
+                }
+                gameState.items.splice(i, 1); i--; 
+            }
         }
     }
 
     function updateHUD() {
-        if (gameState.frameCount % 60 === 0) gameState.timeRemaining--;
         const scoreEl = document.getElementById('score');
         if (scoreEl) scoreEl.innerText = Math.floor(gameState.score);
         const livesEl = document.getElementById('lives');
         if (livesEl) livesEl.innerText = gameState.lives;
         const timeEl = document.getElementById('time');
         if (timeEl) {
-            const minutes = Math.floor(gameState.timeRemaining / 60);
-            const seconds = gameState.timeRemaining % 60;
+            const timeRounded = Math.ceil(gameState.timeRemaining);
+            const minutes = Math.floor(timeRounded / 60);
+            const seconds = Math.max(0, timeRounded % 60);
             timeEl.innerText = `${minutes}:${seconds.toString().padStart(2, '0')}`;
         }
         if (gameState.timeRemaining <= 0 || gameState.lives <= 0) endGame(false);
-        if (gameState.score >= currentLevelConfig.targetScore) endGame(true);
+        if (gameState.score >= targetScore) endGame(true);
     }
 
     function endGame(win) {
@@ -177,17 +229,19 @@ const EcoSortGame = (() => {
         overlay.classList.remove('hidden');
         const title = overlay.querySelector('h3');
         const msg = overlay.querySelector('p');
+        
         if (win) {
-            title.innerText = "¡OCÉANO LIMPIO!"; title.style.color = "#00ff41";
-            msg.innerText = "¡Felicidades! Se acabó la partida.\nVolviendo al Arcade...";
+            title.innerText = "¡LIMPIO!"; title.style.color = "#00ff41";
+            msg.innerText = "¡Genial!";
         } else {
-            title.innerText = "FIN DE MISIÓN"; title.style.color = "#ff0000";
-            msg.innerText = "Demasiados errores de recogida.\nVolviendo al Arcade...";
+            title.innerText = "¡FALLO!"; title.style.color = "#ff0000";
+            msg.innerText = "Demasiada basura.";
         }
 
-        setTimeout(() => {
-            if (window.showGameMenu) window.showGameMenu();
-        }, 3000);
+        // Report to GameMaster (immediate)
+        if (window.GameMaster) {
+            window.GameMaster.onGameResult(win);
+        }
     }
 
     function drawBackground() {

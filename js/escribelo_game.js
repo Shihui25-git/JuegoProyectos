@@ -14,6 +14,8 @@ const EscribeloGame = (() => {
     // Timer
     let timeRemaining = 60;
     let lastTimerTick = 0;
+    let targetWords = 2; // Closure-scoped target
+    let timeLimit = 12; // Base time limit
 
     // Words
     const wordsPhase1 = [
@@ -65,27 +67,56 @@ const EscribeloGame = (() => {
         overlay.querySelector('h3').innerText = "PULSA ENTER PARA EMPEZAR";
         overlay.querySelector('h3').style.color = "#fff";
         overlay.querySelector('p').innerText = "Escríbelo: Escribe las palabras correctamente con tu teclado.";
+        
+        // Clear residual instructions
+        const ctrlP = document.getElementById('game-controls');
+        if (ctrlP) ctrlP.innerText = "TECLADO: Escribe la palabra que aparece";
+        const instP = document.getElementById('game-instruction');
+        if (instP) instP.innerText = "";
 
         ctx.clearRect(0, 0, 800, 400);
         drawBackground();
         updateHUD();
     }
 
-    function startGame() {
+    function startGame(difficulty = 'EASY', speedMultiplier = 1.0) {
         if (!initCanvas()) return;
         running = true;
         score = 0;
         lives = 4;
-        timeRemaining = 60;
-        currentPhase = 1;
+        
+        // Adjust settings based on difficulty
+        const diff = difficulty.toUpperCase();
+        if (diff === 'NORMAL') {
+            currentPhase = 2;
+            targetWords = 3;
+        } else if (diff === 'HARD') {
+            currentPhase = 3;
+            targetWords = 5;
+        } else {
+            currentPhase = 1;
+            targetWords = 2;
+        }
+
+        const baseTime = 12; // 12 seconds
+        timeLimit = Math.max(5, baseTime / speedMultiplier);
+        timeRemaining = Math.ceil(timeLimit);
+        lastTimerTick = performance.now();
+
         gameState = 'playing';
         typedText = "";
         flashColor = null;
         
         document.getElementById('game-overlay').classList.add('hidden');
         lastTime = performance.now();
-        lastTimerTick = lastTime;
         spawnWord();
+        
+        // Update HUD
+        const scoreLabel = document.getElementById('score-label');
+        if (scoreLabel) scoreLabel.innerText = "OBJETIVO:";
+        const scoreGoal = document.getElementById('score-goal');
+        if (scoreGoal) scoreGoal.innerText = " / " + targetWords;
+
         requestAnimationFrame(loop);
     }
 
@@ -130,13 +161,12 @@ const EscribeloGame = (() => {
     }
 
     function update(timestamp) {
+        const dt = (timestamp - lastTime) / 1000;
         // Timer countdown
-        if (timestamp - lastTimerTick >= 1000) {
-            timeRemaining--;
-            lastTimerTick = timestamp;
-            if (timeRemaining <= 0) {
-                endGame("¡TIEMPO AGOTADO!");
-            }
+        timeRemaining -= dt;
+        if (timeRemaining <= 0) {
+            timeRemaining = 0;
+            endGame("¡TIEMPO AGOTADO!");
         }
     }
 
@@ -244,10 +274,13 @@ const EscribeloGame = (() => {
             
             // Finished word?
             if (typedText === currentWord) {
-                score += 2;
-                // Reward extra time for correctness to enable infinite play
-                timeRemaining += 2;
+                score++;
                 triggerFlash('rgba(0, 255, 0, 0.3)', 150);
+
+                if (score >= (targetWords || 2)) {
+                    endGame("¡LOGRADO!", true);
+                    return;
+                }
                 spawnWord();
             }
         } else {
@@ -257,13 +290,10 @@ const EscribeloGame = (() => {
     }
 
     function triggerError() {
-        lives--;
+        if (window.GameMaster) window.GameMaster.loseLife();
+        else lives--;
         typedText = ""; // reset typed text on error
         triggerFlash('rgba(255, 0, 0, 0.4)', 200);
-        
-        if (lives <= 0) {
-            endGame("¡TE HAS QUEDADO SIN VIDAS!");
-        }
     }
 
     function updateHUD() {
@@ -275,11 +305,12 @@ const EscribeloGame = (() => {
 
         const timeEl = document.getElementById('time');
         if (timeEl) {
-            let m = Math.floor(timeRemaining / 60);
-            let s = timeRemaining % 60;
+            const timeRounded = Math.ceil(timeRemaining);
+            let m = Math.floor(timeRounded / 60);
+            let s = timeRounded % 60;
             timeEl.innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
             
-            if (timeRemaining <= 10 && timeRemaining > 0) {
+            if (timeRounded <= 10 && timeRounded > 0) {
                 timeEl.style.color = '#ff4d4d';
             } else {
                 timeEl.style.color = '';
@@ -287,14 +318,18 @@ const EscribeloGame = (() => {
         }
     }
 
-    function endGame(reason = "FIN DEL JUEGO") {
+    function endGame(reason = "FIN DEL JUEGO", win = false) {
         running = false;
         gameState = 'ended';
         const overlay = document.getElementById('game-overlay');
         overlay.classList.remove('hidden');
-        overlay.querySelector('h3').innerText = reason;
-        overlay.querySelector('h3').style.color = reason.includes('GANADO') ? "#0fa" : "#ff4d4d";
-        overlay.querySelector('p').innerText = "Puntuación Final: " + score + "\nPulsa ENTER para reintentar";
+        overlay.querySelector('h3').innerText = win ? "¡LOGRADO!" : "¡FALLO!";
+        overlay.querySelector('p').innerText = reason;
+
+        // Report to GameMaster (immediate)
+        if (window.GameMaster) {
+            window.GameMaster.onGameResult(win);
+        }
         updateHUD();
     }
 

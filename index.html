@@ -173,7 +173,15 @@
                     <span class="close-btn">X</span>
                 </div>
                 <div class="panel-body">
-                    <h3 style="margin-bottom: 1.5rem;">Juegos Disponibles:</h3>
+                    <div class="mission-cta" style="background: rgba(0, 243, 255, 0.1); border: 1px solid var(--secondary-color); padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; display: flex; align-items: center; justify-content: space-between;">
+                        <div>
+                            <h3 style="color: var(--secondary-color); margin: 0;">MODO MISIÓN: OBJETIVO 2030</h3>
+                            <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem; color: #ccc;">Supera todos los retos en secuencia para restaurar el planeta.</p>
+                        </div>
+                        <button id="start-mission-arcade-btn" class="btn btn-small" style="background: var(--secondary-color); color: #000;">INICIAR MISIÓN</button>
+                    </div>
+
+                    <h3 style="margin-bottom: 1rem; border-bottom: 1px solid #333; padding-bottom: 0.5rem;">Práctica Individual:</h3>
                     <div class="game-selection-grid">
                         <div class="game-card" data-game="cyber-runner">
                             <div class="game-card-icon">♻️</div>
@@ -229,6 +237,43 @@
 
             <!-- LEVEL SELECTION MENU DELETED -->
 
+            <!-- INTERMISSION SCREEN -->
+            <div id="intermission-screen" class="panel hidden">
+                <div class="panel-body" style="text-align: center; padding: 5rem 2rem;">
+                    <h2 class="glitch" data-text="¡PREPÁRATE!">¡PREPÁRATE!</h2>
+                    <div id="intermission-stats" style="margin: 2rem 0; font-size: 1.5rem;">
+                        <div class="hud-item">PUNTUACIÓN TOTAL: <span id="master-score">0</span></div>
+                        <div class="hud-item" style="color: var(--secondary-color);">VIDAS: <span
+                                id="master-lives">❤️❤️❤️</span></div>
+                    </div>
+                    <p id="next-game-hint" style="color: var(--primary-color); font-weight: bold; font-size: 1.2rem;">
+                        Siguiente reto: <span id="next-game-name">...</span></p>
+                </div>
+            </div>
+
+            <!-- RESULT SCREEN -->
+            <div id="result-screen" class="panel hidden"
+                style="text-align: center; display: flex; align-items: center; justify-content: center; height: 100%;">
+                <div class="result-content" style="padding: 2rem;">
+                    <h2 id="result-message" style="font-size: 5rem; margin-bottom: 1rem;">¡BIEN!</h2>
+                    <div id="result-points-label" style="font-size: 1.5rem; color: var(--accent-color);">+1 PUNTO</div>
+                </div>
+            </div>
+
+            <!-- GAME OVER SCREEN -->
+            <div id="game-over-screen" class="panel hidden">
+                <div class="panel-body" style="text-align: center; padding: 5rem 2rem;">
+                    <h2 class="glitch" style="color: #ff0000; text-shadow: 2px 2px 0px #550000;"
+                        data-text="FIN DEL JUEGO">FIN DEL JUEGO</h2>
+                    <div style="margin: 2rem 0;">
+                        <p style="font-size: 1.5rem;">Puntuación Final: <span id="final-score">0</span></p>
+                    </div>
+                    <button id="restart-master-btn" class="btn glitch-btn">REINTENTAR MISIÓN</button>
+                    <button id="exit-to-menu-btn" class="btn"
+                        style="margin-left: 1rem; border-color: #555; color: #aaa;">SALIR</button>
+                </div>
+            </div>
+
             <!-- GAME CONTAINER -->
             <div id="game-container-panel" class="panel game-panel hidden">
                 <div class="panel-header">
@@ -243,7 +288,7 @@
                         <div class="hud-item"><span id="score-label">PUNTOS:</span> <span id="score">0</span><span
                                 id="score-goal"></span></div>
                         <div class="hud-item">TIEMPO: <span id="time">0:00</span></div>
-                        <div id="integrity-hud" class="hud-item">INTEGRIDAD: <span id="lives">4</span></div>
+                        <div id="integrity-hud" class="hud-item" style="display: none !important;">INTEGRIDAD: <span id="lives">4</span></div>
                     </div>
                     <div id="game-overlay" class="overlay">
                         <h3>PULSA ENTER PARA EMPEZAR</h3>
@@ -271,6 +316,7 @@
     <script src="js/energy_game.js"></script>
     <script src="js/escribelo_game.js"></script>
     <script src="js/calculo_game.js"></script>
+    <script src="js/game_master.js"></script>
     <script src="js/scripts.js"></script>
 
 </body>

@@ -16,11 +16,12 @@ const ForestGame = (() => {
 
     // --- ESTADO ---
     let state = {
-        active: false, score: 0, time: CONFIG.totalTime, level: 1, lives: 4,
+        active: false, score: 0, time: 12, level: 1, lives: 4,
         fires: [], player: { x: 400, y: 300, speed: 300 },
         lastFrame: 0, floatingTexts: [],
         trees: [], // Posiciones estáticas de los árboles
-        keys: { w: false, a: false, s: false, d: false, ArrowUp: false, ArrowDown: false, ArrowLeft: false, ArrowRight: false }
+        keys: { w: false, a: false, s: false, d: false, ArrowUp: false, ArrowDown: false, ArrowLeft: false, ArrowRight: false },
+        winScore: 5
     };
 
     let canvas, ctx, animationFrameId;
@@ -55,17 +56,41 @@ const ForestGame = (() => {
         window.addEventListener('keyup', handleKeyUp);
     }
 
-    function start() {
+    function start(difficulty = 'EASY', speedMultiplier = 1.0) {
         if (!init()) return;
         reset();
+        
+        // Adjust based on difficulty
+        const diff = difficulty.toUpperCase();
+        if (diff === 'NORMAL') {
+            state.winScore = 3;
+            state.level = 2;
+        } else if (diff === 'HARD') {
+            state.winScore = 5;
+            state.level = 3;
+        } else {
+            state.winScore = 1;
+            state.level = 1;
+        }
+
+        // Apply speed multiplier to time
+        const baseTime = 12; // 12 seconds base
+        state.time = Math.max(5, baseTime / speedMultiplier);
+
         spawnFire();
         state.lastFrame = performance.now();
         loop(state.lastFrame);
         document.getElementById('game-overlay').classList.add('hidden');
+        
+        // Clear residual instructions
+        const ctrlP = document.getElementById('game-controls');
+        if (ctrlP) ctrlP.innerText = "TECLADO: WASD o Flechas para moverte";
+        const instP = document.getElementById('game-instruction');
+        if (instP) instP.innerText = "";
 
         // Reset HUD labels
-        document.getElementById('score-label').innerText = "PUNTOS:";
-        document.getElementById('score-goal').innerText = " / " + CONFIG.winScore;
+        document.getElementById('score-label').innerText = "OBJETIVO:";
+        document.getElementById('score-goal').innerText = " / " + state.winScore;
     }
 
     function stop() {
@@ -96,56 +121,49 @@ const ForestGame = (() => {
     }
 
     function update(dt) {
-        // Movimiento Jugador
-        const speed = 250; // Velocidad en pixels por segundo
-        if (state.keys.w) state.player.y -= speed * dt;
-        if (state.keys.s) state.player.y += speed * dt;
-        if (state.keys.a) state.player.x -= speed * dt;
-        if (state.keys.d) state.player.x += speed * dt;
+        // Movimiento Jugador (WASD o Flechas)
+        const currentSpeed = state.player.speed;
+        if (state.keys.w || state.keys.ArrowUp) state.player.y -= currentSpeed * dt;
+        if (state.keys.s || state.keys.ArrowDown) state.player.y += currentSpeed * dt;
+        if (state.keys.a || state.keys.ArrowLeft) state.player.x -= currentSpeed * dt;
+        if (state.keys.d || state.keys.ArrowRight) state.player.x += currentSpeed * dt;
 
         // Limites
         state.player.x = Math.max(30, Math.min(770, state.player.x));
         state.player.y = Math.max(50, Math.min(370, state.player.y));
+        
         state.time -= dt;
-        if (state.time <= 0) { state.time = 0; endGame(state.score >= CONFIG.winScore); return; }
-
-        // Player movement
-        if (state.keys.w || state.keys.ArrowUp) state.player.y -= state.player.speed * dt;
-        if (state.keys.s || state.keys.ArrowDown) state.player.y += state.player.speed * dt;
-        if (state.keys.a || state.keys.ArrowLeft) state.player.x -= state.player.speed * dt;
-        if (state.keys.d || state.keys.ArrowRight) state.player.x += state.player.speed * dt;
+        if (state.time <= 0) { state.time = 0; endGame(state.score >= state.winScore); return; }
 
         // Limites
         state.player.x = Math.max(30, Math.min(770, state.player.x));
         state.player.y = Math.max(50, Math.min(370, state.player.y));
 
-        // Progresión de niveles
-        if (state.score >= 10) state.level = 3;
-        else if (state.score >= 5) state.level = 2;
-        else state.level = 1;
+        // Lógica de fuego basada en nivel del GameMaster
+        const gameLevel = state.level; // Sincronizado con GameMaster
 
         // Lógica de fuego
         let growthSpeed = 2 + (state.level * 3); // Crecimiento MUY lento (L1=5, L2=8)
         state.fires.forEach((fire, index) => {
             fire.size += dt * growthSpeed;
 
-            // Efecto de viento en Nivel 3
-            if (state.level === 3) {
+            // Efecto de viento en Niveles altos
+            if (gameLevel >= 3) {
                 fire.x += Math.sin(state.lastFrame / 500) * 0.5;
                 fire.y += Math.cos(state.lastFrame / 700) * 0.5;
             }
 
             if (fire.size >= CONFIG.maxFireSize) {
-                state.lives--;
+                if (window.GameMaster) window.GameMaster.loseLife();
+                else state.lives--;
                 showFloatingText("¡BOSQUE DAÑADO!", fire.x, fire.y, '#F44336');
                 state.fires.splice(index, 1);
-                if (state.lives <= 0) endGame(false);
             }
         });
 
         // Spawning de fuego
-        let spawnChance = 0.002 + (state.level * 0.003); // Probabilidad muy baja
-        let maxConcurrent = state.level;
+        let spawnChance = 0.002 + (gameLevel * 0.003); // Probabilidad muy baja
+        let maxConcurrent = gameLevel;
         if (state.fires.length < maxConcurrent && Math.random() < spawnChance) {
             spawnFire();
         }
@@ -171,9 +189,9 @@ const ForestGame = (() => {
             if (dist < 45) {
                 state.score++;
                 showFloatingText("+1 APAGADO", fire.x, fire.y, '#4CAF50');
-                state.fires.splice(index, 1);
+                state.fires.splice(i, 1);
 
-                if (state.score >= CONFIG.winScore) {
+                if (state.score >= state.winScore) {
                     endGame(true);
                 } else if (state.fires.length === 0) {
                     // Si matas el último fuego, spawnea uno nuevo pronto para no dejar al jugador aburrido
@@ -231,7 +249,8 @@ const ForestGame = (() => {
         if (livesEl) livesEl.textContent = state.lives;
 
         if (timeEl) {
-            const m = Math.floor(state.time / 60), s = Math.floor(state.time % 60);
+            const timeRounded = Math.ceil(state.time);
+            const m = Math.floor(timeRounded / 60), s = timeRounded % 60;
             timeEl.textContent = `${m}:${s.toString().padStart(2, '0')}`;
         }
     }
@@ -243,14 +262,14 @@ const ForestGame = (() => {
         overlay.querySelector('h3').innerText = win ? "¡BOSQUE SALVADO!" : "EL BOSQUE SE HA QUEMADO";
 
         let msg = win ?
-            "Misión Completada.\n\nVolviendo al Arcade..." :
-            "La prevención es clave para evitar incendios forestales.\n\nVolviendo al Arcade...";
+            "Misión Completada.\n\nPreparando siguiente reto..." :
+            "La prevención es clave para evitar incendios forestales.\n\nReintentando...";
 
         overlay.querySelector('p').innerHTML = `Puntuación: ${state.score}<br><br><span style="font-size: 14px; color: var(--accent-color);">${msg}</span>`;
 
-        setTimeout(() => {
-            if (window.showGameMenu) window.showGameMenu();
-        }, 3000);
+        if (window.GameMaster && window.GameMaster.onGameResult) {
+            window.GameMaster.onGameResult(win);
+        }
     }
 
     return { start, stop };
