@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const gameCards = document.querySelectorAll('.game-card:not(.game-card-locked)');
     const backToGamesBtn = document.getElementById('back-to-games');
     const backToLevelsBtn = document.getElementById('back-to-levels');
+    const startMissionArcadeBtn = document.getElementById('start-mission-arcade-btn');
     const currentLevelSpan = document.getElementById('current-level');
 
     let selectedLevel = 1;
@@ -98,9 +99,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // Botón de inicio
     if (startBtn) {
         startBtn.addEventListener('click', () => {
-            // Go to Definicion section
-            showSection('definicion');
-            window.location.hash = 'definicion';
+            // Start the chained arcade mode directly
+            showSection('arcade');
+            if (window.GameMaster) window.GameMaster.start();
+        });
+    }
+
+    // Botón de misión dentro de Arcade
+    if (startMissionArcadeBtn) {
+        startMissionArcadeBtn.addEventListener('click', () => {
+            if (window.GameMaster) window.GameMaster.start();
         });
     }
 
@@ -117,6 +125,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     const controls = document.getElementById('game-controls');
                     const instruction = document.getElementById('game-instruction');
 
+                    // Individual play mode (NOT GameMaster)
+                    window.GameMasterIsActive = false; 
+                    
                     if (gameName === 'cyber-runner') {
                         if (gameTitle) gameTitle.textContent = 'ECO-SORT';
                         if (levelSuffix) levelSuffix.style.display = 'inline';

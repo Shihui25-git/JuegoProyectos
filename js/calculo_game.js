@@ -10,14 +10,16 @@ const CalculoGame = (() => {
     let lives = 4;
     let gameState = 'waiting'; // 'waiting', 'playing', 'ended'
     let lastTime = 0;
-    
+
     let operations = [];
     let spawnTimer = 0;
     let spawnInterval = 3000;
     let fallSpeed = 30; // pixels per second
-    
+    let timeRemaining = 0;
+    let targetOps = 2; // Closure-scoped target
+
     let typedAnswer = "";
-    
+
     // Chalk colors
     const BOARD_COLOR = '#2b5329'; // dark green board
     const BORDER_COLOR = '#6b4d24'; // wood
@@ -43,23 +45,29 @@ const CalculoGame = (() => {
         spawnInterval = 3000;
         fallSpeed = 30;
         typedAnswer = "";
-        
+
         // Fix potential button focus trapping keyboard events
         if (document.activeElement) document.activeElement.blur();
         window.focus();
-        
+
         const overlay = document.getElementById('game-overlay');
         overlay.classList.remove('hidden');
         overlay.querySelector('h3').innerText = "PULSA ENTER PARA EMPEZAR";
         overlay.querySelector('h3').style.color = "#fff";
         overlay.querySelector('p').innerText = "Cálculo Rápido: Resuelve las operaciones y pulsa Enter.";
 
+        // Clear potential residual instructions
+        const ctrlP = document.getElementById('game-controls');
+        if (ctrlP) ctrlP.innerText = "TECLADO: Escribe el resultado y pulsa Enter";
+        const instP = document.getElementById('game-instruction');
+        if (instP) instP.innerText = "";
+
         ctx.clearRect(0, 0, 800, 400);
         drawBoard();
         updateHUD();
     }
 
-    function startGame() {
+    function startGame(difficulty = 'EASY', speedMultiplier = 1.0) {
         if (!initCanvas()) return;
         running = true;
         score = 0;
@@ -67,13 +75,35 @@ const CalculoGame = (() => {
         gameState = 'playing';
         operations = [];
         spawnTimer = 0;
-        spawnInterval = 3000;
-        fallSpeed = 30;
         typedAnswer = "";
-        
+
+        // Adjust based on difficulty
+        const diff = difficulty.toUpperCase();
+        if (diff === 'NORMAL') {
+            targetOps = 3;
+            fallSpeed = 45;
+        } else if (diff === 'HARD') {
+            targetOps = 5;
+            fallSpeed = 65;
+        } else {
+            targetOps = 2;
+            fallSpeed = 30;
+        }
+
+        // Timer
+        const baseTime = 12; // 12 seconds
+        timeRemaining = Math.max(5, baseTime / speedMultiplier);
+
         document.getElementById('game-overlay').classList.add('hidden');
         lastTime = performance.now();
         generateOperation();
+
+        // Update HUD labels
+        const scoreLabel = document.getElementById('score-label');
+        if (scoreLabel) scoreLabel.innerText = "OBJETIVO:";
+        const scoreGoal = document.getElementById('score-goal');
+        if (scoreGoal) scoreGoal.innerText = " / " + targetOps;
+
         requestAnimationFrame(loop);
     }
 
@@ -81,12 +111,12 @@ const CalculoGame = (() => {
         const types = ['+', '-', '*'];
         const opType = types[Math.floor(Math.random() * types.length)];
         let num1, num2, result;
-        
+
         // Difficulty scaling based on score
         let difficulty = 1;
         if (score >= 20) difficulty = 3;
         else if (score >= 10) difficulty = 2;
-        
+
         switch (opType) {
             case '+':
                 num1 = Math.floor(Math.random() * (10 * difficulty)) + 1;
@@ -106,7 +136,7 @@ const CalculoGame = (() => {
                 result = num1 * num2;
                 break;
         }
-        
+
         operations.push({
             text: `${num1} ${opType} ${num2}`,
             answer: result.toString(),
@@ -133,23 +163,17 @@ const CalculoGame = (() => {
     }
 
     function update(dt) {
-        // Adjust speed and spawn based on score
-        let targetSpeed = 30;
-        let targetSpawn = 3000;
-        if (score >= 20) {
-            targetSpeed = 45;
-            targetSpawn = 2000;
-        } else if (score >= 10) {
-            targetSpeed = 38;
-            targetSpawn = 2500;
+        // Timer
+        timeRemaining -= dt / 1000;
+        if (timeRemaining <= 0) {
+            timeRemaining = 0;
+            endGame("¡TIEMPO AGOTADO!", false);
+            return;
         }
-        
-        fallSpeed = targetSpeed;
-        spawnInterval = targetSpawn;
 
-        // Spawn logic
+        // Spawn logic (fixed interval for microgame)
         spawnTimer += dt;
-        if (spawnTimer >= spawnInterval) {
+        if (spawnTimer >= 2000) {
             spawnTimer = 0;
             generateOperation();
         }
@@ -158,14 +182,11 @@ const CalculoGame = (() => {
         const moveDist = fallSpeed * (dt / 1000);
         for (let i = operations.length - 1; i >= 0; i--) {
             operations[i].y += moveDist;
-            // Check if it hit bottom
-            if (operations[i].y > canvas.height - 40) { // Don't let it hit user input line
+            if (operations[i].y > canvas.height - 40) {
                 operations.splice(i, 1);
-                lives -= 1;
-                typedAnswer = ""; // clear typed answer in panic
-                if (lives <= 0) {
-                    endGame("¡TE QUEDASTE SIN VIDAS!");
-                }
+                if (window.GameMaster) window.GameMaster.loseLife();
+                else lives -= 1;
+                typedAnswer = "";
             }
         }
     }
@@ -197,7 +218,7 @@ const CalculoGame = (() => {
         ctx.font = 'bold 36px "Comic Sans MS", cursive, sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        
+
         for (let op of operations) {
             ctx.fillStyle = CHALK_WHITE;
             ctx.fillText(op.text, op.x, op.y);
@@ -223,8 +244,6 @@ const CalculoGame = (() => {
     function checkAnswer() {
         if (gameState !== 'playing' || typedAnswer === "") return;
 
-        // Check if any operation matches this answer
-        // We prioritize the lowest one on screen
         let hitIndex = -1;
         let maxY = -1;
         for (let i = 0; i < operations.length; i++) {
@@ -237,14 +256,19 @@ const CalculoGame = (() => {
         }
 
         if (hitIndex !== -1) {
-            // Correct answer
             operations.splice(hitIndex, 1);
-            score += 2;
+            score++;
+
+            if (score >= (targetOps || 2)) {
+                endGame("¡LOGRADO!", true);
+                return;
+            }
         } else {
-            // Incorrect, optionally deduct a small penalty or just do nothing
-            // In this version, we just do nothing and waiting for correct
+            // Mistake: wrong answer submitted
+            if (window.GameMaster) window.GameMaster.loseLife();
+            else lives--;
         }
-        typedAnswer = ""; // Always clear after Enter
+        typedAnswer = "";
     }
 
     function handleInput(key) {
@@ -272,22 +296,28 @@ const CalculoGame = (() => {
     function updateHUD() {
         const scoreEl = document.getElementById('score');
         if (scoreEl) scoreEl.innerText = score;
-
         const livesEl = document.getElementById('lives');
         if (livesEl) livesEl.innerText = lives;
 
         const timeEl = document.getElementById('time');
-        if (timeEl) timeEl.innerText = 'INF';
+        if (timeEl) {
+            const s = Math.ceil(timeRemaining);
+            timeEl.innerText = `0:${s.toString().padStart(2, '0')}`;
+        }
     }
 
-    function endGame(reason = "FIN DEL JUEGO") {
+    function endGame(reason = "FIN DEL JUEGO", win = false) {
         running = false;
         gameState = 'ended';
         const overlay = document.getElementById('game-overlay');
         overlay.classList.remove('hidden');
-        overlay.querySelector('h3').innerText = reason;
-        overlay.querySelector('h3').style.color = CHALK_RED;
-        overlay.querySelector('p').innerText = "Puntos Finales: " + score + "\nPulsa ENTER para reintentar";
+        overlay.querySelector('h3').innerText = win ? "¡LOGRADO!" : "¡FALLO!";
+        overlay.querySelector('p').innerText = reason;
+
+        // Report to GameMaster (immediate)
+        if (window.GameMaster) {
+            window.GameMaster.onGameResult(win);
+        }
         updateHUD();
     }
 

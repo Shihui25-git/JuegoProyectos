@@ -9,6 +9,9 @@ const RecyclingHeroGame = (() => {
     let lives = 3;
     let gameState = 'waiting'; // 'waiting', 'playing', 'ended'
     let lastTime = 0;
+    let targetScore = 3;
+    let timeRemaining = 0;
+    let timeLimit = 12; // Base time
 
     const BINS = [
         { id: 'yellow', color: '#f1c40f', label: 'Envases (Q)', key: 'q', x: 100 },
@@ -62,19 +65,48 @@ const RecyclingHeroGame = (() => {
         ctx.clearRect(0, 0, 800, 400);
         drawBackground();
         drawBins();
+
+        // Clear residual instructions
+        const ctrlP = document.getElementById('game-controls');
+        if (ctrlP) ctrlP.innerText = "TECLADO: Q, W, E, R para clasificar";
+        const instP = document.getElementById('game-instruction');
+        if (instP) instP.innerText = "";
     }
 
-    function startGame() {
+    function startGame(difficulty = 'EASY', speedMultiplier = 1.0) {
         if (!initCanvas()) return;
         running = true;
         score = 0;
-        lives = 3;
-        dropSpeed = 1.0;
+        lives = 4;
         gameState = 'playing';
         currentWord = null;
         particles = [];
+        
+        // Adjust based on difficulty
+        const diff = difficulty.toUpperCase();
+        if (diff === 'NORMAL') {
+            targetScore = 5;
+            dropSpeed = 1.8;
+        } else if (diff === 'HARD') {
+            targetScore = 8;
+            dropSpeed = 2.5;
+        } else {
+            targetScore = 3;
+            dropSpeed = 1.0;
+        }
+
+        // Timer logic
+        const baseTime = 12;
+        timeRemaining = Math.max(5, baseTime / speedMultiplier);
+
         spawnWord();
         document.getElementById('game-overlay').classList.add('hidden');
+
+        // Update HUD
+        const scoreLabel = document.getElementById('score-label');
+        if (scoreLabel) scoreLabel.innerText = "OBJETIVO:";
+        const scoreGoal = document.getElementById('score-goal');
+        if (scoreGoal) scoreGoal.innerText = " / " + targetScore;
 
         lastTime = performance.now();
         requestAnimationFrame(loop);
@@ -136,23 +168,28 @@ const RecyclingHeroGame = (() => {
     }
 
     function update(dt) {
+        // Decrease time
+        timeRemaining -= dt / 1000;
+        if (timeRemaining <= 0) {
+            timeRemaining = 0;
+            endGame("¡TIEMPO AGOTADO!", false);
+            return;
+        }
+
         if (currentWord) {
             currentWord.y += dropSpeed * (dt / 16);
             if (currentWord.y > 330) {
                 // Word hit the ground without being sorted
-                lives--;
+                if (window.GameMaster) window.GameMaster.loseLife();
+                else lives--;
                 flashScreen('rgba(255, 0, 0, 0.4)');
-                if (lives <= 0) {
-                    endGame("¡TE HAS QUEDADO SIN VIDAS!");
-                } else {
-                    spawnWord();
-                }
+                spawnWord();
             }
         }
 
-        // Increase difficulty mildly
-        if (score > 0 && dropSpeed < 3.5) {
-            dropSpeed = 1.0 + (score / 150);
+        if (score >= (targetScore || 3)) {
+            endGame("¡LOGRADO!", true);
+            return;
         }
     }
 
@@ -166,12 +203,9 @@ const RecyclingHeroGame = (() => {
                 flashScreen('rgba(0, 255, 0, 0.2)');
                 createParticles(targetBin.x, 320, targetBin.color);
             } else {
-                lives--;
+                if (window.GameMaster) window.GameMaster.loseLife();
+                else lives--;
                 flashScreen('rgba(255, 0, 0, 0.4)');
-                if (lives <= 0) {
-                    endGame("¡TE HAS QUEDADO SIN VIDAS!");
-                    return;
-                }
             }
             spawnWord();
         }
@@ -252,20 +286,24 @@ const RecyclingHeroGame = (() => {
         if (livesEl) livesEl.innerText = lives;
 
         const timeEl = document.getElementById('time');
-        if (timeEl) timeEl.innerText = 'INF'; // Endless mode mostly
-
-        const goalEl = document.getElementById('score-goal');
-        if (goalEl) goalEl.innerText = "";
+        if (timeEl) {
+            const s = Math.ceil(timeRemaining);
+            timeEl.innerText = `0:${s.toString().padStart(2, '0')}`;
+        }
     }
 
-    function endGame(reason = "FIN DEL JUEGO") {
+    function endGame(reason = "FIN DEL JUEGO", win = false) {
         running = false;
         gameState = 'ended';
         const overlay = document.getElementById('game-overlay');
         overlay.classList.remove('hidden');
-        overlay.querySelector('h3').innerText = reason;
-        overlay.querySelector('h3').style.color = "#ff4d4d";
-        overlay.querySelector('p').innerText = "Puntuación Final: " + score + "\nPulsa ENTER para reintentar";
+        overlay.querySelector('h3').innerText = win ? "¡LOGRADO!" : "¡FALLO!";
+        overlay.querySelector('p').innerText = reason;
+
+        // Report to GameMaster (immediate)
+        if (window.GameMaster) {
+            window.GameMaster.onGameResult(win);
+        }
     }
 
     function flashScreen(color) {
