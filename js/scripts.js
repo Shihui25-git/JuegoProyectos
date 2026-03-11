@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Handle initial hash on load
     if (window.location.hash) {
         const hash = window.location.hash.substring(1);
-        if (['home', 'definicion', 'gestion', 'arcade'].includes(hash)) {
+        if (['home', 'documentacion', 'memoria', 'arcade'].includes(hash)) {
             showSection(hash);
             if (hash === 'arcade') showGameMenu();
         }
@@ -363,6 +363,30 @@ document.addEventListener('DOMContentLoaded', () => {
     // pero si no hay hash, mostramos home por defecto.
     if (!window.location.hash) {
         showSection('home');
+    }
+
+    // --- PARTICLES.JS INITIALIZATION (FIREFLIES) ---
+    if (window.particlesJS) {
+        particlesJS('particles-js', {
+            "particles": {
+                "number": { "value": 50, "density": { "enable": true, "value_area": 800 } },
+                "color": { "value": "#2ecc71" }, // Verde esmeralda coherente
+                "shape": { "type": "circle" },
+                "opacity": { "value": 0.2, "random": true },
+                "size": { "value": 3, "random": true },
+                "line_linked": { "enable": false },
+                "move": {
+                    "enable": true,
+                    "speed": 0.5,
+                    "direction": "none", // Drift random like fireflies
+                    "random": true,
+                    "straight": false,
+                    "out_mode": "out"
+                }
+            },
+            "interactivity": { "events": { "onhover": { "enable": false } } },
+            "retina_detect": true
+        });
     }
 });
 

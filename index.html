@@ -7,19 +7,20 @@
     <title>ODS Runner - Sostenibilidad en Marcha</title>
     <link rel="stylesheet" href="css/style.css">
     <!-- Fuente estilo pixel/retro opcional -->
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rajdhani:wght@400;600&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;600;800&family=Rajdhani:wght@600;700&family=Outfit:wght@400;600&display=swap"
         rel="stylesheet">
 </head>
 
 <body>
+    <div id="particles-js" style="position: fixed; width: 100%; height: 100%; top: 0; left: 0; z-index: -1;"></div>
 
     <header>
         <div class="logo">ECO_PROJECT</div>
         <nav>
             <ul>
                 <li><a href="#home">INICIO</a></li>
-                <li><a href="#definicion">DEFINICIÓN</a></li>
-                <li><a href="#gestion">GESTIÓN</a></li>
+                <li><a href="#documentacion">DOCUMENTACIÓN</a></li>
+                <li><a href="#memoria">MEMORIA</a></li>
                 <li><a href="#arcade">ARCADE</a></li>
             </ul>
         </nav>
@@ -29,22 +30,21 @@
         <section id="home" class="screen active">
             <div class="intro-container">
                 <div class="mission-dashboard">
-                    <div class="system-status">SYSTEM: ONLINE_</div>
-                    <div class="sdg-badge">🌐 ODS 14: VIDA SUBMARINA</div>
-                    <!-- Hologram removed as requested -->
-                    <h1 class="glitch" data-text="MISION 2030">MISIÓN 2030</h1>
-                    <p class="mission-brief">Protegiendo la Vida Submarina y la Biodiversidad Planetaria.</p>
-                    <p class="mission-brief-detail">Únete a la unidad técnica ECO_SORT. Tu misión: restaurar el
-                        equilibrio en los océanos y sectores terrestres críticos.</p>
-                    <button id="start-btn" class="btn glitch-btn">INICIAR MISIÓN: ODS 14</button>
+                    <div class="system-status">ACTIVO_</div>
+                    <div class="sdg-badge">🌍 OBJETIVOS DE DESARROLLO SOSTENIBLE</div>
+                    
+                    <h1>MISIÓN 2030</h1>
+                    <p class="mission-brief">Trabajando por un futuro sostenible y equitativo para todos.</p>
+                    <p class="mission-brief-detail">Explora los 17 objetivos globales y descubre cómo tus acciones pueden transformar el mundo. Cada pequeño paso cuenta para proteger nuestro planeta.</p>
+                    <button id="start-btn" class="btn">COMENZAR DESAFÍO</button>
                 </div>
             </div>
         </section>
 
-        <section id="definicion" class="screen hidden">
+        <section id="documentacion" class="screen hidden">
             <div class="panel">
                 <div class="panel-header">
-                    <h2>&gt;&gt; MISIÓN: DEFINICIÓN</h2>
+                    <h2>&gt;&gt; MISIÓN: DOCUMENTACIÓN</h2>
                     <span class="close-btn">X</span>
                 </div>
                 <div class="panel-body">
@@ -89,10 +89,10 @@
             </div>
         </section>
 
-        <section id="gestion" class="screen hidden">
+        <section id="memoria" class="screen hidden">
             <div class="panel">
                 <div class="panel-header">
-                    <h2>&gt;&gt; LOGS: GESTIÓN</h2>
+                    <h2>&gt;&gt; LOGS: MEMORIA</h2>
                     <span class="close-btn">X</span>
                 </div>
                 <div class="panel-body">
@@ -305,9 +305,10 @@
     </main>
 
     <footer>
-        <p>CONCIENCIACIÓN AMBIENTAL: ACTIVA | © 2026 Eco Project</p>
+        <p>FORJAMOS UN FUTURO SOSTENIBLE | © 2026 Eco Project</p>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script src="js/game.js"></script>
     <script src="js/park_game.js"></script>
     <script src="js/forest_game.js"></script>
