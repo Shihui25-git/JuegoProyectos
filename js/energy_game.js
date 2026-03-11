@@ -167,10 +167,17 @@ class EnergyGameEngine {
 
                 // 6. Scramble and Verify
                 this.scrambleGrid();
-                // If it's still solved by chance, reshuffle pieces
+
+                // Force break the path if accidentally solved
                 let safety = 0;
-                while (this.isCurrentlySolved() && safety < 10) {
+                while (this.isCurrentlySolved() && safety < 50) {
                     this.scrambleGrid();
+                    // Additional forceful break of the main path
+                    let breakCell = path[Math.floor(Math.random() * (path.length - 2)) + 1];
+                    let cellToBreak = this.grid[breakCell.r][breakCell.c];
+                    if (!cellToBreak.fixed && cellToBreak.type !== 'empty') {
+                        cellToBreak.conns.unshift(cellToBreak.conns.pop());
+                    }
                     safety++;
                 }
 

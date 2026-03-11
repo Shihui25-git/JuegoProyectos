@@ -28,7 +28,8 @@ const GameMaster = (() => {
         { id: 'recycling', name: 'HERO RECYCLING', script: 'RecyclingHeroGame' },
         { id: 'energy', name: 'ENERGY GAME', script: 'EnergyGame' },
         { id: 'escribelo', name: 'ESCRÍBELO', script: 'EscribeloGame' },
-        { id: 'calculo', name: 'CÁLCULO', script: 'CalculoGame' }
+        { id: 'calculo', name: 'CÁLCULO', script: 'CalculoGame' },
+        { id: 'laberinto', name: 'EL LABERINTO', script: 'LaberintoGame' }
     ];
 
     // DOM Elements
