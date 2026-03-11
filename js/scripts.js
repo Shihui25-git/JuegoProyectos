@@ -126,8 +126,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     const instruction = document.getElementById('game-instruction');
 
                     // Individual play mode (NOT GameMaster)
-                    window.GameMasterIsActive = false; 
-                    
+                    window.GameMasterIsActive = false;
+
                     if (gameName === 'cyber-runner') {
                         if (gameTitle) gameTitle.textContent = 'ECO-SORT';
                         if (levelSuffix) levelSuffix.style.display = 'inline';
@@ -265,9 +265,29 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (window.RecyclingHeroGame && window.RecyclingHeroGame.stop) window.RecyclingHeroGame.stop();
                         if (window.EnergyGame && window.EnergyGame.stop) window.EnergyGame.stop();
                         if (window.EscribeloGame && window.EscribeloGame.stop) window.EscribeloGame.stop();
+                        if (window.LaberintoGame && window.LaberintoGame.stop) window.LaberintoGame.stop();
 
                         window.currentGameMode = 'calculo';
                         showGame('calculo');
+                    } else if (gameName === 'laberinto') {
+                        if (gameTitle) gameTitle.textContent = 'Laberinto';
+                        if (levelSuffix) levelSuffix.style.display = 'none';
+                        if (integrityHud) integrityHud.style.display = 'block';
+                        if (controls) controls.innerHTML = 'WASD / Flechas: Mover';
+                        if (instruction) instruction.textContent = 'Recoge las monedas y escapa de la polución.';
+
+                        // Stop others
+                        if (window.EcoSortGame && window.EcoSortGame.stop) window.EcoSortGame.stop();
+                        if (window.ParkGame && window.ParkGame.stop) window.ParkGame.stop();
+                        if (window.ForestGame && window.ForestGame.stop) window.ForestGame.stop();
+                        if (window.TrafficControlGame && window.TrafficControlGame.stop) window.TrafficControlGame.stop();
+                        if (window.RecyclingHeroGame && window.RecyclingHeroGame.stop) window.RecyclingHeroGame.stop();
+                        if (window.EnergyGame && window.EnergyGame.stop) window.EnergyGame.stop();
+                        if (window.EscribeloGame && window.EscribeloGame.stop) window.EscribeloGame.stop();
+                        if (window.CalculoGame && window.CalculoGame.stop) window.CalculoGame.stop();
+
+                        window.currentGameMode = 'laberinto';
+                        showGame('laberinto');
                     }
                 });
             }
@@ -317,6 +337,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     msg.innerText = "Cálculo mental rápido. Usa los números y pulsa Enter.";
                 }
                 if (window.CalculoGame) window.CalculoGame.start();
+                break;
+            case 'laberinto':
+                if (window.LaberintoGame) window.LaberintoGame.start();
                 break;
             default:
                 // mode is numeric level for Eco-Sort

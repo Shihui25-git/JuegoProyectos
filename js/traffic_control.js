@@ -19,8 +19,7 @@ const TrafficControlGame = (() => {
 
     const VEHICLE_TYPES = {
         CAR: { points: 5, speed: 2, color: '#ff4d4d', label: '🚗', pollutionRate: 0.05 },
-        BUS: { points: 20, speed: 1.5, color: '#3498db', label: '🚌', pollutionRate: 0.01 },
-        BIKE: { points: 30, speed: 1.2, color: '#2ecc71', label: '🚲', pollutionRate: 0 }
+        BUS: { points: 20, speed: 1.5, color: '#3498db', label: '🚌', pollutionRate: 0.01 }
     };
 
     let vehicles = [];
@@ -59,11 +58,11 @@ const TrafficControlGame = (() => {
         vehicles = [];
         nsGreen = true;
         spawnTimer = 0;
-        
+
         // Setup Overlay
         const overlay = document.getElementById('game-overlay');
         overlay.classList.add('hidden');
-        
+
         // Clear residual instructions
         const ctrlP = document.getElementById('game-controls');
         if (ctrlP) ctrlP.innerText = "ESPACIO / CLIC: Cambiar semáforos";
@@ -97,21 +96,8 @@ const TrafficControlGame = (() => {
     function spawnVehicle() {
         const sides = ['N', 'S', 'E', 'W'];
         const side = sides[Math.floor(Math.random() * sides.length)];
-        const types = [
-            { type: 'CAR', weight: 0.7 },
-            { type: 'BUS', weight: 0.15 },
-            { type: 'BIKE', weight: 0.15 }
-        ];
 
-        let rand = Math.random();
-        let selectedType = 'CAR';
-        for (let t of types) {
-            if (rand < t.weight) {
-                selectedType = t.type;
-                break;
-            }
-            rand -= t.weight;
-        }
+        let selectedType = 'CAR'; // Fixed to only spawn cars
 
         const typeData = VEHICLE_TYPES[selectedType];
         let v = {
@@ -185,10 +171,10 @@ const TrafficControlGame = (() => {
 
     function drawTrafficLights() {
         const lights = [
-            { x: 320, y: 120, vertical: true }, 
-            { x: 460, y: 270, vertical: true }, 
-            { x: 320, y: 270, vertical: false }, 
-            { x: 460, y: 120, vertical: false }  
+            { x: 320, y: 120, vertical: true },
+            { x: 460, y: 270, vertical: true },
+            { x: 320, y: 270, vertical: false },
+            { x: 460, y: 120, vertical: false }
         ];
 
         lights.forEach(l => {
@@ -245,7 +231,7 @@ const TrafficControlGame = (() => {
             }
 
             if (!v.scored) {
-                if ((v.direction === 'N' && v.y > 450) || (v.direction === 'S' && v.y < -50) || 
+                if ((v.direction === 'N' && v.y > 450) || (v.direction === 'S' && v.y < -50) ||
                     (v.direction === 'W' && v.x > 850) || (v.direction === 'E' && v.x < -50)) {
                     score++;
                     v.scored = true;
@@ -270,7 +256,8 @@ const TrafficControlGame = (() => {
                 const dx = Math.abs(v1.x - v2.x);
                 const dy = Math.abs(v1.y - v2.y);
 
-                if (dx < 30 && dy < 30) {
+                // Reduce collision box size to prevent unfair side-byside collisions (was randomly hitting at 30)
+                if (dx < 22 && dy < 22) {
                     if (window.GameMaster) window.GameMaster.loseLife();
                     else lives--;
                     flashScreen('rgba(255, 0, 0, 0.4)');
@@ -301,7 +288,7 @@ const TrafficControlGame = (() => {
             ctx.font = '20px Arial';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.rotate(-v.rotation * Math.PI / 180); 
+            ctx.rotate(-v.rotation * Math.PI / 180);
             ctx.fillText(v.label, 0, 0);
             ctx.restore();
         });
@@ -312,7 +299,7 @@ const TrafficControlGame = (() => {
         if (scoreEl) scoreEl.innerText = score;
         const livesEl = document.getElementById('lives');
         if (livesEl) livesEl.innerText = lives;
-        
+
         const timeEl = document.getElementById('time');
         if (timeEl) {
             const s = Math.ceil(timeRemaining);
