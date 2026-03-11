@@ -196,12 +196,6 @@ const EcoSortGame = (() => {
                 }
                 gameState.items.splice(i, 1); i--;
             } else if (item.y > 400) { 
-                if (!item.isHazard) {
-                    // Letting a good item fall costs a life
-                    if (window.GameMaster) window.GameMaster.loseLife();
-                    else gameState.lives--;
-                    flashScreen('rgba(255, 0, 0, 0.1)');
-                }
                 gameState.items.splice(i, 1); i--; 
             }
         }
