@@ -203,74 +203,249 @@
         <section id="memoria" class="screen hidden">
             <div class="panel">
                 <div class="premium-header">
-                    <h2>&gt;&gt; LOGS: MEMORIA</h2>
+                    <h2>&gt;&gt; DIARIO DE DESARROLLO</h2>
                     <span class="close-btn">X</span>
                 </div>
                 <div class="panel-body">
+                    <!-- Gestión del Proyecto -->
                     <div class="premium-card">
-                        <h3>BITÁCORA DEL DESARROLLADOR</h3>
-                        <div class="timeline">
-                            <div class="timeline-item complete">
-                                <div class="timeline-dot"></div>
-                                <div class="timeline-content">
-                                    <h4>Fase 1: Inicialización</h4>
-                                    <p>Repositorio y Estructura Base</p>
-                                </div>
-                            </div>
-                            <div class="timeline-item complete">
-                                <div class="timeline-dot"></div>
-                                <div class="timeline-content">
-                                    <h4>Fase 2: Core Mechanics</h4>
-                                    <p>Lógica de juego y Persistencia</p>
-                                </div>
-                            </div>
-                            <div class="timeline-item in-progress">
-                                <div class="timeline-dot"></div>
-                                <div class="timeline-content">
-                                    <h4>Fase 3: UI/UX Upgrade</h4>
-                                    <p>Tema "Premium Neo-Verde" aplicado</p>
-                                </div>
-                            </div>
-                            <div class="timeline-item pending">
-                                <div class="timeline-dot"></div>
-                                <div class="timeline-content">
-                                    <h4>Fase 4: Audio & Polish</h4>
-                                    <p>Efectos de sonido y partículas</p>
-                                </div>
-                            </div>
+                        <h3 style="color: var(--primary-color);">Gestión del Proyecto</h3>
+                        <p style="margin-bottom: 1rem;">Todo el avance, tareas pendientes y bugs se gestionan a través
+                            de nuestro tablero Kanban.</p>
+                        <a href="https://trello.com" class="btn"
+                            style="text-decoration: none; display: inline-block;">VER TABLERO DE TRELLO</a>
+                    </div>
+
+                    <!-- Día 1 -->
+                    <div class="premium-card">
+                        <h3 style="color: var(--primary-color);">Día 1: Planificación y Setup (19/02/2026)</h3>
+                        <p style="margin-bottom: 0.5rem; color: #fff;"><strong>Tareas Realizadas:</strong></p>
+                        <ul class="doc-list" style="margin-bottom: 1.5rem;">
+                            <li style="margin-bottom: 0.8rem;">
+                                <strong style="color: var(--primary-color);">[Gestión]</strong> Creación del repositorio
+                                en GitHub e invitación a colaboradores.
+                                <br><span style="color: #64748b; font-size: 0.85rem;">Asignado: Shihui | Validado:
+                                    Adrián</span>
+                            </li>
+                            <li style="margin-bottom: 0.8rem;">
+                                <strong style="color: var(--primary-color);">[Gestión]</strong> Configuración del
+                                tablero Kanban en Trello.
+                                <br><span style="color: #64748b; font-size: 0.85rem;">Asignado: Adrián | Validado:
+                                    Adriana</span>
+                            </li>
+                            <li style="margin-bottom: 0.8rem;">
+                                <strong style="color: var(--primary-color);">[Docs]</strong> Redacción del documento
+                                inicial de requisitos.
+                                <br><span style="color: #64748b; font-size: 0.85rem;">Asignado: Adriana | Validado:
+                                    Adrián</span>
+                            </li>
+                            <li>
+                                <strong style="color: var(--primary-color);">[Diseño]</strong> Lluvia de ideas juegos y
+                                estética página.
+                                <br><span style="color: #64748b; font-size: 0.85rem;">Asignado: Shihui, Adriana, Adrián
+                                    | Validado: Adrián, Shihui, Adriana</span>
+                            </li>
+                        </ul>
+
+                        <!-- Imágenes de Trello -->
+                        <div
+                            style="text-align: center; display: flex; flex-direction: column; gap: 1rem; margin-top: 1.5rem;">
+                            <img src="img/DIA 1.png" alt="Captura de Trello 1"
+                                style="width: 100%; border-radius: 6px; border: 1px solid rgba(16, 185, 129, 0.3); background: #0f172a; padding: 4px;">
+                            <img src="img/DIA 1.1.png" alt="Captura de Trello 2"
+                                style="width: 100%; border-radius: 6px; border: 1px solid rgba(16, 185, 129, 0.3); background: #0f172a; padding: 4px;">
+                            <img src="img/DIA 1.2.png" alt="Captura de Trello 3"
+                                style="width: 100%; border-radius: 6px; border: 1px solid rgba(16, 185, 129, 0.3); background: #0f172a; padding: 4px;">
                         </div>
                     </div>
 
+                    <!-- Día 2 -->
                     <div class="premium-card">
-                        <h3>INDICADORES DE SISTEMA</h3>
-                        <div class="tactical-grid">
-                            <div class="tactical-item">
-                                <span class="tactical-title">⚡ Energía Limpia</span>
-                                <div class="tech-bar"
-                                    style="height: 8px; background: #eee; border-radius: 4px; overflow: hidden; margin: 10px 0;">
-                                    <div class="tech-fill"
-                                        style="width: 75%; height: 100%; background: var(--primary-color);"></div>
-                                </div>
-                                <span class="tactical-detail">Eficiencia actual: 75%</span>
-                            </div>
-                            <div class="tactical-item">
-                                <span class="tactical-title">💧 Agua Potable</span>
-                                <div class="tech-bar"
-                                    style="height: 8px; background: #eee; border-radius: 4px; overflow: hidden; margin: 10px 0;">
-                                    <div class="tech-fill"
-                                        style="width: 60%; height: 100%; background: var(--primary-color);"></div>
-                                </div>
-                                <span class="tactical-detail">Abastecimiento: 60%</span>
-                            </div>
-                            <div class="tactical-item">
-                                <span class="tactical-title">📉 Índice Carbono</span>
-                                <div class="tech-bar"
-                                    style="height: 8px; background: #eee; border-radius: 4px; overflow: hidden; margin: 10px 0;">
-                                    <div class="tech-fill warning"
-                                        style="width: 40%; height: 100%; background: #e74c3c;"></div>
-                                </div>
-                                <span class="tactical-detail">Reducción lograda: 40%</span>
-                            </div>
+                        <h3 style="color: var(--primary-color);">Día 2: Creacion microjuegos y funcionalidad
+                            (26/02/2026)</h3>
+                        <p style="margin-bottom: 0.5rem; color: #fff;"><strong>Tareas Realizadas:</strong></p>
+                        <ul class="doc-list" style="margin-bottom: 1.5rem;">
+                            <li style="margin-bottom: 0.8rem;">
+                                <strong style="color: var(--primary-color);">[Dev]</strong> Implementacion juego 1.
+                                <br><span style="color: #64748b; font-size: 0.85rem;">Asignado: Shihui | Validado:
+                                    Adrián</span>
+                            </li>
+                            <li style="margin-bottom: 0.8rem;">
+                                <strong style="color: var(--primary-color);">[Dev]</strong> Implementacion juego 2.
+                                <br><span style="color: #64748b; font-size: 0.85rem;">Asignado: Adrián | Validado:
+                                    Adriana</span>
+                            </li>
+                            <li style="margin-bottom: 0.8rem;">
+                                <strong style="color: var(--primary-color);">[Dev]</strong> Implementacion juego 3.
+                                <br><span style="color: #64748b; font-size: 0.85rem;">Asignado: Adriana | Validado:
+                                    Adrián</span>
+                            </li>
+                            <li>
+                                <strong style="color: var(--primary-color);">[QA]</strong> Revision Funcionalidad.
+                                <br><span style="color: #64748b; font-size: 0.85rem;">Asignado: Shihui, Adriana, Adrián
+                                    | Validado: Adrián, Shihui, Adriana</span>
+                            </li>
+                        </ul>
+
+                        <!-- Imágenes de Trello -->
+                        <div
+                            style="text-align: center; display: flex; flex-direction: column; gap: 1rem; margin-top: 1.5rem;">
+                            <img src="img/DIA 2.png" alt="Captura de Trello Día 2 - 1"
+                                style="width: 100%; border-radius: 6px; border: 1px solid rgba(16, 185, 129, 0.3); background: #0f172a; padding: 4px;">
+                            <img src="img/DIA 2.1.png" alt="Captura de Trello Día 2 - 2"
+                                style="width: 100%; border-radius: 6px; border: 1px solid rgba(16, 185, 129, 0.3); background: #0f172a; padding: 4px;">
+                        </div>
+                    </div>
+
+                    <!-- Día 3 -->
+                    <div class="premium-card">
+                        <h3 style="color: var(--primary-color);">Día 3: Creacion microjuegos y funcionalidad
+                            (05/03/2026)</h3>
+                        <p style="margin-bottom: 0.5rem; color: #fff;"><strong>Tareas Realizadas:</strong></p>
+                        <ul class="doc-list" style="margin-bottom: 1.5rem;">
+                            <li style="margin-bottom: 0.8rem;">
+                                <strong style="color: var(--primary-color);">[QA]</strong> Solucion de errores en la
+                                funcionalidad.
+                                <br><span style="color: #64748b; font-size: 0.85rem;">Asignado: Shihui | Validado:
+                                    Adrián</span>
+                            </li>
+                            <li style="margin-bottom: 0.8rem;">
+                                <strong style="color: var(--primary-color);">[Dev]</strong> Implementacion juego 4.
+                                <br><span style="color: #64748b; font-size: 0.85rem;">Asignado: Shihui | Validado:
+                                    Adrián</span>
+                            </li>
+                            <li style="margin-bottom: 0.8rem;">
+                                <strong style="color: var(--primary-color);">[Dev]</strong> Implementacion juego 5.
+                                <br><span style="color: #64748b; font-size: 0.85rem;">Asignado: Adrián | Validado:
+                                    Adriana</span>
+                            </li>
+                            <li style="margin-bottom: 0.8rem;">
+                                <strong style="color: var(--primary-color);">[Dev]</strong> Implementacion juego 6.
+                                <br><span style="color: #64748b; font-size: 0.85rem;">Asignado: Adriana | Validado:
+                                    Adrián</span>
+                            </li>
+                            <li>
+                                <strong style="color: var(--primary-color);">[QA]</strong> Revision Funcionalidad.
+                                <br><span style="color: #64748b; font-size: 0.85rem;">Asignado: Shihui, Adriana, Adrián
+                                    | Validado: Adrián, Shihui, Adriana</span>
+                            </li>
+                        </ul>
+
+                        <!-- Imágenes de Trello -->
+                        <div
+                            style="text-align: center; display: flex; flex-direction: column; gap: 1rem; margin-top: 1.5rem;">
+                            <img src="img/DIA 3.png" alt="Captura de Trello Día 3 - 1"
+                                style="width: 100%; border-radius: 6px; border: 1px solid rgba(16, 185, 129, 0.3); background: #0f172a; padding: 4px;">
+                            <img src="img/DIA 3.1.png" alt="Captura de Trello Día 3 - 2"
+                                style="width: 100%; border-radius: 6px; border: 1px solid rgba(16, 185, 129, 0.3); background: #0f172a; padding: 4px;">
+                        </div>
+                    </div>
+
+                    <!-- Día 4 -->
+                    <div class="premium-card">
+                        <h3 style="color: var(--primary-color);">Día 4: Creacion microjuegos y funcionalidad
+                            (09/03/2026)</h3>
+                        <p style="margin-bottom: 0.5rem; color: #fff;"><strong>Tareas Realizadas:</strong></p>
+                        <ul class="doc-list" style="margin-bottom: 1.5rem;">
+                            <li style="margin-bottom: 0.8rem;">
+                                <strong style="color: var(--primary-color);">[QA]</strong> Revision en la funcionalidad
+                                p2.
+                                <br><span style="color: #64748b; font-size: 0.85rem;">Asignado: Adriana | Validado:
+                                    Shihui</span>
+                            </li>
+                            <li style="margin-bottom: 0.8rem;">
+                                <strong style="color: var(--primary-color);">[Dev]</strong> Implementacion juego 7.
+                                <br><span style="color: #64748b; font-size: 0.85rem;">Asignado: Adrián | Validado:
+                                    Adriana</span>
+                            </li>
+                            <li style="margin-bottom: 0.8rem;">
+                                <strong style="color: var(--primary-color);">[Dev]</strong> Implementacion juego 8.
+                                <br><span style="color: #64748b; font-size: 0.85rem;">Asignado: Adrián | Validado:
+                                    Adriana</span>
+                            </li>
+                            <li>
+                                <strong style="color: var(--primary-color);">[Dev]</strong> Implementacion juego 9.
+                                <br><span style="color: #64748b; font-size: 0.85rem;">Asignado: Adriana | Validado:
+                                    Shihui</span>
+                            </li>
+                        </ul>
+
+                        <!-- Imágenes de Trello -->
+                        <div
+                            style="text-align: center; display: flex; flex-direction: column; gap: 1rem; margin-top: 1.5rem;">
+                            <img src="img/DIA 4.png" alt="Captura de Trello Día 4 - 1"
+                                style="width: 100%; border-radius: 6px; border: 1px solid rgba(16, 185, 129, 0.3); background: #0f172a; padding: 4px;">
+                        </div>
+                    </div>
+
+                    <!-- Día 5 -->
+                    <div class="premium-card">
+                        <h3 style="color: var(--primary-color);">Día 5: Creacion microjuegos y funcionalidad
+                            (10/03/2026)</h3>
+                        <p style="margin-bottom: 0.5rem; color: #fff;"><strong>Tareas Realizadas:</strong></p>
+                        <ul class="doc-list" style="margin-bottom: 1.5rem;">
+                            <li style="margin-bottom: 0.8rem;">
+                                <strong style="color: var(--primary-color);">[QA]</strong> Revision en la funcionalidad
+                                p3.
+                                <br><span style="color: #64748b; font-size: 0.85rem;">Asignado: Adriana | Validado:
+                                    Shihui</span>
+                            </li>
+                            <li style="margin-bottom: 0.8rem;">
+                                <strong style="color: var(--primary-color);">[Dev]</strong> Solucion problemas github.
+                                <br><span style="color: #64748b; font-size: 0.85rem;">Asignado: Adrián | Validado:
+                                    Adriana</span>
+                            </li>
+                            <li style="margin-bottom: 0.8rem;">
+                                <strong style="color: var(--primary-color);">[Dev]</strong> Implementacion del sistema
+                                de dificultad.
+                                <br><span style="color: #64748b; font-size: 0.85rem;">Asignado: Adrián | Validado:
+                                    Adriana</span>
+                            </li>
+                            <li>
+                                <strong style="color: var(--primary-color);">[Dev]</strong> Implementacion Logica
+                                Secuencial.
+                                <br><span style="color: #64748b; font-size: 0.85rem;">Asignado: Adriana | Validado:
+                                    Shihui</span>
+                            </li>
+                        </ul>
+
+                        <!-- Imágenes de Trello -->
+                        <div
+                            style="text-align: center; display: flex; flex-direction: column; gap: 1rem; margin-top: 1.5rem;">
+                            <img src="img/DIA 5.png" alt="Captura de Trello Día 5 - 1"
+                                style="width: 100%; border-radius: 6px; border: 1px solid rgba(16, 185, 129, 0.3); background: #0f172a; padding: 4px;">
+                            <img src="img/DIA 5.1.png" alt="Captura de Trello Día 5 - "
+                                style="width: 100%; border-radius: 6px; border: 1px solid rgba(16, 185, 129, 0.3); background: #0f172a; padding: 4px;">
+                        </div>
+                    </div>
+
+                    <!-- Día 6 -->
+                    <div class="premium-card">
+                        <h3 style="color: var(--primary-color);">Día 6: Creacion microjuegos y funcionalidad
+                            (11/03/2026)</h3>
+                        <p style="margin-bottom: 0.5rem; color: #fff;"><strong>Tareas Realizadas:</strong></p>
+                        <ul class="doc-list" style="margin-bottom: 1.5rem;">
+                            <li style="margin-bottom: 0.8rem;">
+                                <strong style="color: var(--primary-color);">[QA]</strong> Revision en la funcionalidad
+                                p4.
+                                <br><span style="color: #64748b; font-size: 0.85rem;">Asignado: Adriana | Validado:
+                                    Shihui</span>
+                            </li>
+                            <li>
+                                <strong style="color: var(--primary-color);">[Dev]</strong> Dar estructura a la pagina
+                                web y base visual.
+                                <br><span style="color: #64748b; font-size: 0.85rem;">Asignado: Adrián | Validado:
+                                    Adriana</span>
+                            </li>
+                        </ul>
+
+                        <!-- Imágenes de Trello -->
+                        <div
+                            style="text-align: center; display: flex; flex-direction: column; gap: 1rem; margin-top: 1.5rem;">
+                            <img src="img/DIA 6.png" alt="Captura de Trello Día 6 - 1"
+                                style="width: 100%; border-radius: 6px; border: 1px solid rgba(16, 185, 129, 0.3); background: #0f172a; padding: 4px;">
+                            <img src="img/DIA 6.1.png" alt="Captura de Trello Día 6 - 2"
+                                style="width: 100%; border-radius: 6px; border: 1px solid rgba(16, 185, 129, 0.3); background: #0f172a; padding: 4px;">
                         </div>
                     </div>
                 </div>
